@@ -155,15 +155,15 @@ function compareObjects(o1, o2, depth=0, stack=[]) {
     }
 }
 
-function printStack(stack) {
-    stack.forEach(o => console.log(o));
-}
-
 function printDeep(str, d=0) {
     console.log("/".repeat(d));
     console.log(str);
 }
 
 function prettyStack(stack) {
+<<<<<<< variant A
     stack.reverse().forEach((o,i) => printDeep(o, i));
+>>>>>>> variant B
+    stack.reverse().forEach((o, i) => printDeep(o, i));
+======= end
 }

@@ -987,8 +987,12 @@ function sequenceGlyph(canvas, tier, feature, style, forceHeight) {
                 seq += "-".repeat(co.cnt);
                 quals += "Z".repeat(co.cnt);
             } else if (co.op === 'I') {
+
                 let inseq = rawseq.substr(cursor, co.cnt);
-                let ig = new Glyphs.TriangleGlyph(minPos + (seq.length*scale), 5, 'S', 5, tier.browser.baseColors['I']);
+                let ig = new Glyphs.TranslatedGlyph(
+                    new Glyphs.TriangleGlyph(minPos + (seq.length*scale), 6, 'S', 5, tier.browser.baseColors['I']),
+                    0, -2, 0
+                );
                 if (insertionLabels)
                     ig = new Glyphs.LabelledGlyph(canvas, ig, inseq, false, 'center', 'above', '7px sans-serif');
                 ig.feature = {label: 'Insertion: ' + inseq, type: 'insertion', method: 'insertion'};
@@ -1063,7 +1067,6 @@ function makeLinePlot(features, style, tier, yshift) {
     }
 
     let yscale = ((1.0 * height) / (max - min));
-    let width = style.LINEWIDTH || 1;
     let color = style.FGCOLOR || style.COLOR1 || 'black';
 
     let prevSign = 1;
@@ -1084,10 +1087,12 @@ function makeLinePlot(features, style, tier, yshift) {
             curSign = f.score < 0 ? -1 : 1;
 
             if (curSign !== prevSign) {
-                glyphSequences.push({points: curGlyphPoints,
-                                     color: prevSign === 1 ?
-                                       style.POSCOLOR
-                                     : style.NEGCOLOR});
+                glyphSequences.push({
+                    points: curGlyphPoints,
+                    color: prevSign === 1 ?
+                        style.POSCOLOR
+                        : style.NEGCOLOR
+                });
                 curGlyphPoints = [];
                 // Need to add the previous point to this sequence,
                 // otherwise there is a gap in the resulting plot
@@ -1108,8 +1113,10 @@ function makeLinePlot(features, style, tier, yshift) {
     if (isDasBooleanTrue(style.ADDITIVE)) {
         color = curSign === 1 ? style.POSCOLOR : style.NEGCOLOR;
     }
-    glyphSequences.push({points: curGlyphPoints,
-                         color: color});
+    glyphSequences.push({
+        points: curGlyphPoints,
+        color: color
+    });
 
 
     let lggs = glyphSequences.map(gs => {

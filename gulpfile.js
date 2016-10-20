@@ -10,8 +10,6 @@ var babelify = require('babelify');
 
 var eslint = require('gulp-eslint');
 
-require("babel-polyfill");
-
 
 
 gulp.task('build-worker', function() {

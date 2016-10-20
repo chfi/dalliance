@@ -328,7 +328,7 @@ Browser.prototype.realInit = function() {
     this.resizeListener = function(ev) {
         thisB.resizeViewer();
     };
-    
+
     this.ruler = makeElement('div', null, {className: 'guideline'})
     this.ruler2 = makeElement('div', null, {className: 'single-base-guideline'});
     this.tierHolderHolder.appendChild(this.ruler);
@@ -387,7 +387,7 @@ Browser.prototype.realInit2 = function() {
 
     this.featurePanelWidth = this.tierHolder.getBoundingClientRect().width | thisB.offscreenInitWidth | 0;
     window.addEventListener('resize', this.resizeListener, false);
-    
+
     this.scale = this.featurePanelWidth / (this.viewEnd - this.viewStart);
     if (!this.zoomMax) {
         this.zoomMax = this.zoomExpt * Math.log(this.maxViewWidth / this.zoomBase);
@@ -860,7 +860,6 @@ Browser.prototype.touchMoveHandler = function(ev) {
             this.viewStart = scp - (cp/this.scale)|0;
             for (var i = 0; i < this.tiers.length; ++i) {
                 tiers[i].getRenderer().drawTier(tiers[i]);
-                // this.tiers[i].draw();
             }
         }
         this.zoomLastSep = sep;
@@ -1397,7 +1396,6 @@ Browser.prototype.arrangeTiers = function() {
 }
 
 Browser.prototype.refresh = function() {
-    var browser = this;
     this.retrieveTierData(this.tiers);
     this.drawOverlays();
     this.positionRuler();
@@ -1456,7 +1454,6 @@ Browser.prototype.retrieveTierData = function(tiers) {
                                      this.drawnStart,
                                      this.drawnEnd,
                                      scaledQuantRes);
-                                     // tierRenderer);
 }
 
 function setSources(msh, availableSources, maybeMapping) {
@@ -1863,8 +1860,8 @@ Browser.prototype._setLocation = function(newChr, newMin, newMax, newChrInfo, ca
         }
 
         this.refresh();
-        var self = this;
-        this.tiers.forEach(function(tier) {self.refreshTier(tier);});
+        // var self = this;
+        // this.tiers.forEach(function(tier) {self.refreshTier(tier);});
         // this.refreshTier
 
         if (this.savedZoom) {
