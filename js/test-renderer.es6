@@ -161,9 +161,5 @@ function printDeep(str, d=0) {
 }
 
 function prettyStack(stack) {
-<<<<<<< variant A
-    stack.reverse().forEach((o,i) => printDeep(o, i));
->>>>>>> variant B
     stack.reverse().forEach((o, i) => printDeep(o, i));
-======= end
 }
