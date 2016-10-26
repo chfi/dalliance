@@ -12,10 +12,11 @@ import Data.Foreign
 -- foreign import registerFactory :: forall a. String -> (a -> Foreign)
 -- foreign import featureSourceBase :: Foreign
 
-foreign import dasFeature :: Fn4 Number Number String Number Foreign
+-- foreign import dasFeature :: Fn4 Number Number String Number Foreign
+foreign import dasFeature :: Number -> Number -> String -> Number -> Foreign
 
-dasFeature' = runFn4 dasFeature
+-- dasFeature' = runFn4 dasFeature
 
 
 newFeature :: Number -> Foreign
-newFeature score = dasFeature' 2.0 4.0 "chrTest" score
+newFeature score = dasFeature 2.0 4.0 "chrTest" score
