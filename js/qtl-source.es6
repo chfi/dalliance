@@ -2,15 +2,10 @@
 
 
 import { registerSourceAdapterFactory,
-         makeParser,
          FeatureSourceBase
        } from "./sourceadapters.js";
 
-import { DASStylesheet,
-         DASStyle,
-         DASFeature,
-         DASGroup
-       } from "./das.js";
+import { DASFeature } from "./das.js";
 
 import * as Csv from "./csv.es6";
 

@@ -23,8 +23,6 @@ import { parseCigar } from "./cigar.js";
 
 import { formatQuantLabel } from "./numformats";
 
-import * as Test from "./Test";
-
 import * as R from "ramda";
 
 // The only functions that must be exported by a renderer are renderTier
@@ -46,9 +44,6 @@ function renderTier(status, tier) {
 }
 
 function drawTier(tier) {
-    console.log("Purescript:");
-    console.log(Test);
-    console.log(Test.hello);
     let canvas = tier.viewport.getContext("2d");
     let retina = tier.browser.retina && window.devicePixelRatio > 1;
     if (retina) {
