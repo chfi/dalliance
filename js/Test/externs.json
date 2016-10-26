@@ -1,0 +1,1 @@
+{"efVersion":"0.10.1","efModuleName":["Test"],"efExports":[{"ValueRef":{"Ident":"hello"}}],"efImports":[{"eiModule":["Prim"],"eiImportType":{"Implicit":[]},"eiImportedAs":null}],"efFixities":[],"efTypeFixities":[],"efDeclarations":[{"EDValue":{"edValueName":{"Ident":"hello"},"edValueType":{"tag":"TypeConstructor","contents":[["Prim"],"String"]}}}]}
