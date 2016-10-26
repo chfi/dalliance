@@ -9,6 +9,15 @@ var babel = require('gulp-babel');
 var babelify = require('babelify');
 
 var eslint = require('gulp-eslint');
+var purescript = require('gulp-purescript');
+
+
+gulp.task('psc', function() {
+    return purescript.psc({
+        src: 'purs/*.purs',
+        output: 'js/'
+    });
+});
 
 
 
@@ -82,8 +91,8 @@ gulp.task('watch', function() {
   gulp.watch('js/*.js', ['default']);
 });
 
-gulp.task('default', ['build-main', 'build-worker']);
-gulp.task('compile', ['compile-main', 'compile-worker']);
+gulp.task('default', ['psc', 'build-main', 'build-worker']);
+gulp.task('compile', ['psc', 'compile-main', 'compile-worker']);
 
 gulp.task('lint-es6', function() {
     return gulp.src('js/*.es6')
