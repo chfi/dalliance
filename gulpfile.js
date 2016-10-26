@@ -12,10 +12,15 @@ var eslint = require('gulp-eslint');
 var purescript = require('gulp-purescript');
 
 
+
+
+
 gulp.task('psc', function() {
     return purescript.psc({
-        src: 'purs/*.purs',
-        output: 'js/'
+        src: ['purs/*.purs',
+              'bower_components/purescript-*/src/**/*.purs'
+             ],
+        output: 'js/PS/'
     });
 });
 

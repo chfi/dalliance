@@ -1,0 +1,19 @@
+{
+  "name": "dalliance",
+  "description": "Fast, embeddable genome visualization",
+  "main": "",
+  "license": "BSD-2-Clause",
+  "homepage": "https://biodalliance.org",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^2.1.0",
+    "purescript-console": "^2.0.0"
+  }
+}
