@@ -13,6 +13,7 @@ class QtlMapSource extends FeatureSourceBase {
     constructor(source) {
         super();
 
+        console.log(source);
         this.qtlCsv = Csv.loadCsv(source.uri, {mode: "file"}, function() {});
 
     }

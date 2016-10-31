@@ -15,11 +15,21 @@ exports.featureSourceBase = function() {
     return SourceAdapters.FeatureSourceBase;
 };
 
-exports.dasFeature = R.uncurryN(4, function(min, max, segment, score) {
+exports.dasFeature = R.curry(function(min, max, segment, score) {
     var feature = new DAS.DASFeature();
     feature.min = min;
     feature.max = max;
     feature.segment = segment;
     feature.score = score;
     return feature;
+});
+
+exports.createSource = R.curry(function(constructor, fetch) {
+    var newSource = function(source) {
+        FeatureSourceBase.call(this);
+        constructor(source);
+    };
+    newSource.prototype = Object.create(FeatureSourceBase.prototype);
+    newSource.prototype.constructor = newClass;
+    newSource.prototype.fetch = R.uncurryN(7, fetch);
 });

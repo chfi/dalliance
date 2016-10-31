@@ -1,3 +1,6 @@
 module QtlSourcePurs where
 
-qtl = "false"
+foreign import das :: String
+
+qtl :: String
+qtl = das

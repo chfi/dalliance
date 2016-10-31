@@ -27,6 +27,7 @@ To build:
     npm install # Install dependencies
     npm install --save-dev babel-cli babel-core babel-preset-es2015
     npm install --save-dev gulp gulp-babel
+    bower install
     gulp        # Build Dalliance
 
 ...then open any of the HTML files in the `example-browsers` directory
