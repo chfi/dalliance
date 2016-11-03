@@ -4,4 +4,5 @@ dalliance-compiled.js
 build
 tmp
 node_modules
+bower_components
 js/PS/*
