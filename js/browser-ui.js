@@ -86,7 +86,7 @@ Browser.prototype.initUI = function(holder, genomePanel) {
     var tierEditButton = makeElement('a', [makeElement('i', null, {className: 'fa fa-road'})], {className: 'btn'});
     b.makeTooltip(tierEditButton, 'Configure currently selected track(s) (E)')
 
-    var leapLeftButton = makeElement('a', [makeElement('i', null, {className: 'fa fa-angle-left'})], {className: 'btn'}, {width: '5px'});
+    var leapLeftButton = makeElement('a', [makeElement('i', null, {className: 'fa fa-angle-left'})], {className: 'btn pull-right'}, {width: '5px'});
     var leapRightButton = makeElement('a', [makeElement('i', null, {className: 'fa fa-angle-right'})], {className: 'btn pull-right'}, {width: '5px'});
 
     var modeButtons = makeElement('div', null, {className: 'btn-group pull-right'});
@@ -112,12 +112,12 @@ Browser.prototype.initUI = function(holder, genomePanel) {
         }
     }
 
-    if (!this.noLeapButtons)
-        toolbar.appendChild(leapRightButton);
 
     if (modeButtons.firstChild)
         toolbar.appendChild(modeButtons);
-    
+
+    if (!this.noLeapButtons)
+        toolbar.appendChild(leapRightButton);
     if (!this.noLeapButtons)
         toolbar.appendChild(leapLeftButton);
     if (!this.noTitle) {
@@ -133,7 +133,7 @@ Browser.prototype.initUI = function(holder, genomePanel) {
                                                 makeElement('span', zoomSlider, {className: 'btn'}),
                                                 zoomOutBtn], {className: 'btn-group'}));
     }
-    
+
     if (this.toolbarBelow) {
         holder.appendChild(genomePanel);
         holder.appendChild(toolbar);
@@ -147,7 +147,7 @@ Browser.prototype.initUI = function(holder, genomePanel) {
     var lt5 = Math.log(5) / Math.log(10);
     var roundSliderValue = function(x) {
         var ltx = (x / b.zoomExpt + Math.log(b.zoomBase)) / Math.log(10);
-        
+
         var whole = ltx|0
         var frac = ltx - whole;
         var rounded
@@ -198,7 +198,7 @@ Browser.prototype.initUI = function(holder, genomePanel) {
         var zmax = zoom.max;
         var zrange = zmax - zmin;
 
-        
+
         var numSliderTicks = 4;
         if (b.zoomSliderWidth && b.zoomSliderWidth < 150)
             numSliderTicks = 3;
@@ -243,7 +243,7 @@ Browser.prototype.initUI = function(holder, genomePanel) {
             });
         }
     }, false);
-    
+
     var trackAddPopup;
     addTrackBtn.addEventListener('click', function(ev) {
         if (trackAddPopup && trackAddPopup.displayed) {
@@ -526,8 +526,8 @@ Browser.prototype.toggleOptsPopup = function(ev) {
             b.storeStatus();
         }, false);
         optsTable.appendChild(makeElement('tr', [makeElement('td', 'Vertical guideline', {align: 'right'}), makeElement('td', rulerSelect)]));
-        
-        var singleBaseHighlightButton = makeElement('input', '', {type: 'checkbox', checked: b.singleBaseHighlight}); 
+
+        var singleBaseHighlightButton = makeElement('input', '', {type: 'checkbox', checked: b.singleBaseHighlight});
         singleBaseHighlightButton.addEventListener('change', function(ev) {
             b.singleBaseHighlight = singleBaseHighlightButton.checked;
             b.positionRuler();
@@ -535,7 +535,7 @@ Browser.prototype.toggleOptsPopup = function(ev) {
         }, false);
         singleBaseHighlightButton.setAttribute('id','singleBaseHightlightButton'); // making this because access is required when the key 'u' is pressed and the options are visible
         optsTable.appendChild(makeElement('tr', [makeElement('td', 'Display and highlight current genome location', {align: 'right'}), makeElement('td', singleBaseHighlightButton)]));
-        
+
         optsForm.appendChild(optsTable);
 
         var resetButton = makeElement('button', 'Reset browser', {className: 'btn'}, {marginLeft: 'auto', marginRight: 'auto', display: 'block'});
