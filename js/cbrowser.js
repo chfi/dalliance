@@ -74,6 +74,10 @@ function Browser(opts) {
           'test': TestRenderer
         };
 
+    for (var name in opts.renderers) {
+        this.addRenderer(name, opts.renderers.name);
+    }
+
     this.defaultRenderer = opts.renderer || DefaultRenderer;
 
     this.prefix = '//www.biodalliance.org/release-0.14/';
@@ -241,6 +245,13 @@ function Browser(opts) {
         }
         window.addEventListener('load', loadListener, false);
     }
+}
+
+Browser.prototype.addRenderer = function(name, module) {
+    if (this.renderers[name]) {
+        console.log("Warning: Modifying existing renderer");
+    }
+    this.renderers[name] = module;
 }
 
 Browser.prototype.resolveURL = function(url) {
