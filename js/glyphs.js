@@ -299,9 +299,9 @@ LineGraphGlyph.prototype.draw = function(g) {
 
 LineGraphGlyph.prototype.toSVG = function() {
     var p = new SVGPath();
-    for (var i = 0; i < this.points.length; i += 2) {
-        var x = this.points[i];
-        var y = this.points[i + 1];
+    for (let i = 0; i < this.points.length; ++i) {
+        var x = this.points[i].x;
+        var y = this.points[i].y;
         if (i == 0) {
             p.moveTo(x, y);
         } else {
@@ -1142,9 +1142,7 @@ AminoAcidGlyph.prototype.toSVG = function() {
     return g;
 };
 
-(function(scope) {
-
-var isRetina = window.devicePixelRatio > 1;
+var isRetina = typeof(window) !== 'undefined' && window.devicePixelRatio > 1;
 var __dalliance_SequenceGlyphCache = {};
 var altPattern = new RegExp('^[ACGT-]$');
 var isCloseUp = function(scale) {
@@ -1314,10 +1312,6 @@ SequenceGlyph.prototype.toSVG = function() {
 
     return g;
 }
-
-scope.SequenceGlyph = SequenceGlyph;
-
-}(this));
 
 function TranslatedGlyph(glyph, x, y, height) {
     this.glyph = glyph;
@@ -1592,7 +1586,7 @@ if (typeof(module) !== 'undefined') {
         ArrowGlyph: ArrowGlyph,
         TooManyGlyph: TooManyGlyph,
         TextGlyph: TextGlyph,
-        SequenceGlyph: this.SequenceGlyph,
+        SequenceGlyph: SequenceGlyph,
         AminoAcidGlyph: AminoAcidGlyph,
         TranslatedGlyph: TranslatedGlyph,
         GridGlyph: GridGlyph,

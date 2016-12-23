@@ -44,14 +44,12 @@ if (typeof(require) !== 'undefined') {
     var sourceDataURI = sourcecompare.sourceDataURI;
     var sourceStyleURI = sourcecompare.sourceStyleURI;
 
-    var DefaultRenderer = require('./default-renderer.es6');
-    var OldRenderer = require('./old-renderer.js');
+    var DefaultRenderer = require('./default-renderer');
 
-    var MultiRenderer = require('./multi-renderer.es6');
-    var SubRenderer = require('./sub-renderer.es6');
+    var MultiRenderer = require('./multi-renderer');
+    var SubRenderer = require('./sub-renderer');
 
-    var TestRenderer = require('./test-renderer.es6');
-    var DummyRenderer = require('./dummy-renderer.es6');
+    var DummyRenderer = require('./dummy-renderer');
 }
 
 function Region(chr, min, max) {
@@ -69,9 +67,7 @@ function Browser(opts) {
         { 'default': DefaultRenderer,
           'dummy': DummyRenderer,
           'multi': MultiRenderer,
-          'sub': SubRenderer,
-          'old': OldRenderer,
-          'test': TestRenderer
+          'sub': SubRenderer
         };
 
     this.defaultRenderer = opts.renderer || DefaultRenderer;
@@ -96,8 +92,6 @@ function Browser(opts) {
     this.chains = {};
 
     this.pageName = 'svgHolder'
-    this.maxExtra = 2.5;
-    this.minExtra = 0.5;
     this.zoomFactor = 1.0;
     this.maxPixelsPerBase = 10;
     this.origin = 0;
@@ -118,6 +112,9 @@ function Browser(opts) {
     this.highZoomThreshold = 0.2;
     this.mediumZoomThreshold = 0.01
 
+    this.minExtraWidth = 100.0;
+    this.maxExtraWidth = 1000.0;
+    
     // Options.
 
     this.reverseScrolling = false;
@@ -199,6 +196,7 @@ function Browser(opts) {
     for (var k in opts) {
         this[k] = opts[k];
     }
+    
     if (typeof(opts.uiPrefix) === 'string' && typeof(opts.prefix) !== 'string') {
         this.prefix = opts.uiPrefix;
     }
@@ -249,10 +247,16 @@ Browser.prototype.resolveURL = function(url) {
 
 Browser.prototype.destroy = function() {
     window.removeEventListener('resize', this.resizeListener, false);
+    if (this.fetchWorkers) {
+        for (const worker of this.fetchWorkers) {
+            worker.terminate();
+        }
+    }
 }
 
 Browser.prototype.realInit = function() {
     var self = this;
+    var thisB = this;
 
     if (this.wasInitialized) {
         console.log('Attemping to call realInit on an already-initialized Dalliance instance');
@@ -261,10 +265,12 @@ Browser.prototype.realInit = function() {
 
     this.wasInitialized = true;
 
-    var ua = navigator.userAgent || 'dummy';
-    if (ua.indexOf('Trident') >= 0 && ua.indexOf('rv:11') >= 0) {
-        // console.log('Detected IE11, disabling tier pinning.');
-        this.disablePinning = true;
+    if (typeof(navigator) !== 'undefined') {
+        var ua = navigator.userAgent || 'dummy';
+        if (ua.indexOf('Trident') >= 0 && ua.indexOf('rv:11') >= 0) {
+            // console.log('Detected IE11, disabling tier pinning.');
+            this.disablePinning = true;
+        }
     }
 
     this.defaultChr = this.chr;
@@ -281,9 +287,20 @@ Browser.prototype.realInit = function() {
         this.statusRestored = this.restoreStatus();
     }
 
-    var helpPopup;
-    var thisB = this;
-    this.browserHolderHolder = document.getElementById(this.pageName);
+    if (this.injectionPoint && this.injectionPoint instanceof Element) {
+        this.browserHolderHolder = this.injectionPoint;
+    } else if (this.injectionPoint) {
+        this.browserHolderHolder = document.getElementById(this.injectionPoint);
+        if (!this.browserHolderHolder) {
+            throw Error('injectionPoint must point to a valid DOM element of element ID');
+        }
+    } else {
+        this.browserHolderHolder = document.getElementById(this.pageName);
+        if (!this.browserHolderHolder) {
+            throw Error('pageName must be a valid element ID (or use the injectionPoint option instead)');
+        }
+    }
+    
     this.browserHolderHolder.classList.add('dalliance-injection-point');
     this.browserHolder = makeElement('div', null, {className: 'dalliance dalliance-root', tabIndex: -1});
     if (this.maxHeight) {
@@ -743,6 +760,12 @@ Browser.prototype.realInit2 = function() {
                 thisB.refreshTier(tier);
             });
         }
+    }
+
+    if (this.onFirstRender) {
+        Promise.all(this.tiers.map(t => t.firstRenderPromise))
+            .then(() => this.onFirstRender())
+            .catch((err) => console.log(err));
     }
 
     thisB._ensureTiersGrouped();
@@ -1399,7 +1422,6 @@ Browser.prototype.refresh = function() {
     this.retrieveTierData(this.tiers);
     this.drawOverlays();
     this.positionRuler();
-
 };
 
 var defaultTierRenderer = function(status, tier) {
@@ -1409,8 +1431,8 @@ var defaultTierRenderer = function(status, tier) {
 Browser.prototype.retrieveTierData = function(tiers) {
     this.notifyLocation();
     var width = (this.viewEnd - this.viewStart) + 1;
-    var minExtraW = (100.0/this.scale)|0;
-    var maxExtraW = (1000.0/this.scale)|0;
+    var minExtraW = (this.minExtraWidth / this.scale)|0;
+    var maxExtraW = (this.maxExtraWidth / this.scale)|0;
 
     var newOrigin = (this.viewStart + this.viewEnd) / 2;
     var oh = newOrigin - this.origin;
@@ -1597,8 +1619,8 @@ Browser.prototype.spaceCheck = function(dontRefresh) {
     }
 
     var width = ((this.viewEnd - this.viewStart)|0) + 1;
-    var minExtraW = (100.0/this.scale)|0;
-    var maxExtraW = (1000.0/this.scale)|0;
+    var minExtraW = (this.minExtraWidth / this.scale)|0;
+    var maxExtraW = (this.maxExtraWidth / this.scale)|0;
 
     if ((this.drawnStart|0) > Math.max(1, ((this.viewStart|0) - minExtraW)|0)  || (this.drawnEnd|0) < Math.min((this.viewEnd|0) + minExtraW, ((this.currentSeqMax|0) > 0 ? (this.currentSeqMax|0) : 1000000000)))  {
         this.refresh();
@@ -2598,6 +2620,10 @@ FetchWorker.prototype.postCommand = function(cmd, callback, transfer) {
     cmd.tag = tag;
     this.callbacks[tag] = callback;
     this.worker.postMessage(cmd, transfer);
+}
+
+FetchWorker.prototype.terminate = function() {
+    this.worker.terminate();
 }
 
 if (typeof(module) !== 'undefined') {

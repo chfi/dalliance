@@ -157,6 +157,7 @@ function DasTier(browser, source, config, background)
 
     this.listeners = [];
     this.featuresLoadedListeners = [];
+    this.firstRenderPromise = new Promise((resolve, reject) => this._resolveFirstRenderPromise = resolve);
 }
 
 DasTier.prototype.destroy = function() {
@@ -622,6 +623,8 @@ DasTier.prototype.scheduleRedraw = function() {
 
     if (!this.redrawTimeout) {
         this.redrawTimeout = setTimeout(function() {
+            sortFeatures(tier);   // Some render actions mutate the results of this,
+                                  // => need to re-run before refreshing.
             var renderer = tier.browser.getTierRenderer(tier);
             renderer.drawTier(tier);
             tier.redrawTimeout = null;
@@ -670,7 +673,6 @@ DasTier.prototype.removeFeaturesLoadedListener = function(handler) {
     }
 }
 
-
 DasTier.prototype.notifyFeaturesLoaded = function() {
     for (var li = 0; li < this.featuresLoadedListeners.length; ++li) {
         try {
@@ -681,6 +683,10 @@ DasTier.prototype.notifyFeaturesLoaded = function() {
     }
 }
 
+DasTier.prototype.wasRendered = function() {
+    this._resolveFirstRenderPromise();
+}
+
 if (typeof(module) !== 'undefined') {
     module.exports = {
         DasTier: DasTier
@@ -688,8 +694,4 @@ if (typeof(module) !== 'undefined') {
 
     // Imported for side effects
     var fd = require('./feature-draw');
-    var drawFeatureTier = fd.drawFeatureTier;
-    var sd = require('./sequence-draw');
-    var drawSeqTier = sd.drawSeqTier;
-    // require('./sourceadapters');  /* Done in cbrowser instead */
 }

@@ -108,7 +108,9 @@ URLFetchable.prototype.slice = function(s, l) {
 }
 
 var seed=0;
-var isSafari = navigator.userAgent.indexOf('Safari') >= 0 && navigator.userAgent.indexOf('Chrome') < 0 ;
+var isSafari = typeof(navigator) !== 'undefined' &&
+    navigator.userAgent.indexOf('Safari') >= 0 &&
+    navigator.userAgent.indexOf('Chrome') < 0 ;
 
 URLFetchable.prototype.fetchAsText = function(callback) {
     var thisB = this;
@@ -142,7 +144,7 @@ URLFetchable.prototype.fetchAsText = function(callback) {
             if (thisB.opts.credentials) {
                 req.withCredentials = true;
             }
-            req.send('');
+            req.send();
         } catch (e) {
             return callback(null);
         }
@@ -241,7 +243,7 @@ URLFetchable.prototype.fetch = function(callback, opts) {
             if (thisB.opts.credentials) {
                 req.withCredentials = true;
             }
-            req.send('');
+            req.send();
         } catch (e) {
             return callback(null);
         }
@@ -265,20 +267,17 @@ function bstringToBuffer(result) {
 
 // Read from Uint8Array
 
-(function(global) {
-    var convertBuffer = new ArrayBuffer(8);
-    var ba = new Uint8Array(convertBuffer);
-    var fa = new Float32Array(convertBuffer);
+var convertBuffer = new ArrayBuffer(8);
+var ba = new Uint8Array(convertBuffer);
+var fa = new Float32Array(convertBuffer);
 
-
-    global.readFloat = function(buf, offset) {
-        ba[0] = buf[offset];
-        ba[1] = buf[offset+1];
-        ba[2] = buf[offset+2];
+function readFloat(buf, offset) {
+    ba[0] = buf[offset];
+    ba[1] = buf[offset+1];
+    ba[2] = buf[offset+2];
         ba[3] = buf[offset+3];
-        return fa[0];
-    };
- }(this));
+    return fa[0];
+}
 
 function readInt64(ba, offset) {
     return (ba[offset + 7] << 24) | (ba[offset + 6] << 16) | (ba[offset + 5] << 8) | (ba[offset + 4]);
@@ -312,6 +311,6 @@ if (typeof(module) !== 'undefined') {
         readInt64: readInt64,
         readShort: readShort,
         readByte: readByte,
-        readFloat: this.readFloat
+        readFloat: readFloat
     }
 }

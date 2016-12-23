@@ -27,8 +27,6 @@ if (typeof(require) !== 'undefined') {
     var nf = require('./numformats');
     var formatQuantLabel = nf.formatQuantLabel;
     var formatLongInt = nf.formatLongInt;
-
-    var drawFeatureTier = require('./feature-draw').drawFeatureTier;
 }
 
 
@@ -99,7 +97,11 @@ Browser.prototype.makeSVG = function(opts) {
         tier.backupSubtiers = tier.subtiers;
         tier.backupOriginHaxx = tier.originHaxx;
         tier.backupLayoutHeight = tier.layoutHeight;
-        drawFeatureTier(tier, tier.sequenceSource ? tier.currentSequence : null)
+
+        const renderer = b.getTierRenderer(tier);
+        if (renderer && renderer.prepareSubtiers) {
+            renderer.prepareSubtiers(tier, tier.viewport.getContext('2d'));
+        }
 
         var tierSVG = makeElementNS(NS_SVG, 'g', null, {clipPath: 'url(#featureClip)', clipRule: 'nonzero'});
     	var tierLabels = makeElementNS(NS_SVG, 'g');
@@ -227,7 +229,19 @@ Browser.prototype.makeSVG = function(opts) {
     
     this.featurePanelWidth = backupFPW;
     this.scale = backupScale;
-    
-    var svgBlob = new Blob([new XMLSerializer().serializeToString(saveDoc)], {type: 'image/svg+xml'});
-    return svgBlob;
+
+    let svg;
+    if (typeof(XMLSerializer) !== 'undefined') {
+        svg = new XMLSerializer().serializeToString(saveDoc);
+    } else {
+        const root = saveDoc.documentElement;
+        root.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        svg = root.outerHTML;
+    }
+
+    if (opts.output && opts.output === 'string') {
+        return svg;
+    } else {
+        return new Blob([svg], {type: 'image/svg+xml'});
+    }
 }

@@ -491,7 +491,7 @@ DASFeatureSource.prototype.fetch = function(chr, min, max, scale, types, pool, c
     );
 };
 
-DASFeatureSource.prototype.findNextFeature = this.sourceFindNextFeature = function(chr, pos, dir, callback) {
+DASFeatureSource.prototype.findNextFeature = function(chr, pos, dir, callback) {
     if (this.dasSource.capabilities && arrayIndexOf(this.dasSource.capabilities, 'das1:adjacent-feature') >= 0) {
         var thisB = this;
         if (this.dasAdjLock) {
@@ -631,7 +631,7 @@ EnsemblSequenceSource.prototype.fetch = function(chr, min, max, pool, callback) 
     };
     req.open('GET', url, true);
     req.responseType = 'text';
-    req.send('');
+    req.send();
 };
 
 EnsemblSequenceSource.prototype.getSeqInfo = function(chr, cnt) {
@@ -649,7 +649,7 @@ EnsemblSequenceSource.prototype.getSeqInfo = function(chr, cnt) {
   };
   req.open('GET', url, true);
   req.responseType = 'text';
-  req.send('');
+  req.send();
 };
 
 DASFeatureSource.prototype.getScales = function() {
@@ -686,7 +686,7 @@ function BWGFeatureSource(bwgSource) {
             if (this.opts.credentials) {
                 req.withCredentials = true;
             }
-            req.send('');
+            req.send();
         }
         pfs.await(function(status) {
             if (status === 'success') {
@@ -1281,7 +1281,7 @@ function BAMFeatureSource(bamSource) {
             if (this.opts.credentials) {
                 req.withCredentials = 'true';
             }
-            req.send('');
+            req.send();
         }
         pfs.await(function(status) {
             if (status === 'success') {

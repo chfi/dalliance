@@ -1,6 +1,6 @@
 {
   "name": "dalliance",
-  "version": "0.13.8",
+  "version": "0.13.90-alpha.1",
   "description": "Fast, embeddable genome visualization",
   "homepage": "https://www.biodalliance.org/",
   "license": "BSD-2-Clause",
@@ -11,10 +11,11 @@
   "dependencies": {
     "es6-promise": "~3.0.2",
     "jszlib": "dasmoth/jszlib",
-    "papaparse": "~4.1.2"
+    "papaparse": "~4.1.2",
+    "ramda": "^0.21.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.11.4",
+    "babel-cli": "^6.18.0",
     "babel-core": "^6.13.2",
     "babel-polyfill": "^6.9.1",
     "babel-preset-es2015": "^6.13.2",
@@ -32,9 +33,13 @@
     "karma-browserify": "4.4.2",
     "karma-chrome-launcher": "^0.2.2",
     "karma-jasmine": "~0.3.6",
-    "ramda": "^0.21.0",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
     "watchify": "~3.6.1"
+  },
+  "files": ["lib", "css", "fonts", "help", "img", "build/worker-all.js"],
+  "main": "lib/module-exports.js",
+  "scripts": {
+    "compile": "babel js -d lib && gulp compile-worker"
   }
 }
