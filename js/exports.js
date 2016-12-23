@@ -38,3 +38,5 @@ window.DASSource = das.DASSource;    // Pre-0.8 configurations used this.  Still
 var ruler = require("./rulers");
 window.Ruler = ruler.Ruler;
 window.rulerDrawCallback = ruler.rulerDrawCallback;
+
+window.WrappedRenderer = require("./wrapped-renderer.es6");
