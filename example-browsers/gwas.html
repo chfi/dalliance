@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <style>
+        </style>
+
+        <title>Mouse GRCm38 :: Dalliance</title>
+        <script language="javascript" src="../build/dalliance-all.js"></script>
+
+        <script language="javascript" src="./gwasRenderer.js"></script>
+
+        <script language="javascript">
+
+         var gwasRenderer = WrappedRenderer.wrapRenderer(PS["Biodalliance.Renderer.GWAS"].createRenderer({canvasHeight: 300.0}));
+
+         var b = new Browser({
+             chr:        '11',
+             defaultStart: 10000000,
+             defaultEnd: 30000000,
+             viewStart:  10000000,
+             viewEnd:    30000000,
+             maxViewWidth: 20000000,
+             cookieKey:  'mouse38',
+
+             renderers: { gwasRenderer: gwasRenderer },
+
+             coordSystem: {
+                 speciesName: 'Mouse',
+                 taxon: 10090,
+                 auth: 'GRCm',
+                 version: 38,
+                 ucscName: 'mm10'
+             },
+
+             sources:      [{name: 'Genome',
+                             twoBitURI:  'http://www.biodalliance.org/datasets/GRCm38/mm10.2bit',
+                             desc: 'Mouse reference genome build GRCm38',
+                             tier_type: 'sequence',
+                             provides_entrypoints: true}
+                           ,{name: 'QTL',
+                             tier_type: 'qtl',
+                             renderer: "gwasRenderer",
+                             uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv',
+                             style: [
+                                 { type: "default",
+                                   style: { glyph: "LINEPLOT",
+                                            BUMP: "no",
+                                            COLOR1: "blue",
+                                            COLOR2: "blue",
+                                            COLOR3: "blue",
+                                            HEIGHT: "120",
+                                            MAX: "50",
+                                            MIN: "0",
+                                            AUTOMAX: "yes",
+                                            AUTOMIN: "yes",
+                                            STEPS: "500"
+                                   }
+                                 }
+                             ]},
+             ],
+             uiPrefix: '../',
+
+             fullScreen: true,
+
+             //renderer: 'test'
+
+
+         });
+
+         b.reset();
+        </script>
+    </head>
+
+    <body>
+        <div id='svgHolder'>Failed to load the Biodalliance genome browser.  Have you run "gulp"?</div>
+    </body>
+</html>
