@@ -59,7 +59,8 @@ function drawTier(tier) {
     if (tier.subtiers) {
         let vOffset = R.defaultTo(0, tier.dasSource.vOffset);
 
-        prepareViewport(tier, canvas, retina, true, vOffset);   // NB calls canvas.save
+        canvas.save();
+        prepareViewport(tier, canvas, retina, true, vOffset);
         paint(tier, canvas, vOffset);
         canvas.restore();
     }
@@ -619,7 +620,6 @@ function prepareViewport(tier, canvas, retina, clear=true, vOffset=0) {
     tier.updateHeight();
     tier.norigin = tier.browser.viewStart;
 
-    canvas.save();
     if (retina) {
         canvas.scale(2, 2);
     }
