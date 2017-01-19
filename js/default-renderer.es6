@@ -59,10 +59,8 @@ function drawTier(tier) {
     if (tier.subtiers) {
         let vOffset = R.defaultTo(0, tier.dasSource.vOffset);
 
-        canvas.save();
         prepareViewport(tier, canvas, retina, true, vOffset);
         paint(tier, canvas, vOffset);
-        canvas.restore();
     }
 
     tier.drawOverlay();
@@ -327,7 +325,7 @@ function groupFeatures(tier, canvas, y) {
     if (stackedFeatures.length > 0) {
         glyphs = glyphs.concat(makeStackedBars(stackedFeatures, tier));
     }
-    
+
     for (let gbs in gbsFeatures) {
         let gf = gbsFeatures[gbs];
         let style = gbsStyles[gbs];
@@ -586,6 +584,7 @@ function clearViewport(canvas, width, height) {
 
 // Make the viewport & canvas the correct size for the tier
 function prepareViewport(tier, canvas, retina, clear=true, vOffset=0) {
+    canvas.save();
     let desiredWidth = tier.browser.featurePanelWidth + 2000;
     if (retina) {
         desiredWidth *= 2;
@@ -630,9 +629,11 @@ function prepareViewport(tier, canvas, retina, clear=true, vOffset=0) {
 
     drawUnmapped(tier, canvas, lh);
 
+    canvas.restore();
 }
 
 function paint(tier, canvas, vOffset=0) {
+    canvas.save();
     let overlayLabelCanvas = new Glyphs.OverlayLabelCanvas();
     let offset = ((tier.glyphCacheOrigin - tier.browser.viewStart)*tier.browser.scale)+1000;
     canvas.translate(offset, vOffset + tier.padding);
@@ -644,7 +645,6 @@ function paint(tier, canvas, vOffset=0) {
         tier.overlayLabelCanvas = overlayLabelCanvas;
     else
         tier.overlayLabelCanvas = null;
-
     canvas.restore();
 }
 

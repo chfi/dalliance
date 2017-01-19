@@ -121,6 +121,7 @@ function drawTier(multiTier) {
 }
 
 function prepareViewport(tier, canvas, retina, canvasHeight, clear=true) {
+    canvas.save();
     let desiredWidth = tier.browser.featurePanelWidth + 2000;
     if (retina) {
         desiredWidth *= 2;
@@ -156,4 +157,5 @@ function prepareViewport(tier, canvas, retina, canvasHeight, clear=true) {
 
     DefaultRenderer.drawUnmapped(tier, canvas, canvasHeight);
 
+    canvas.restore();
 }
