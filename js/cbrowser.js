@@ -70,6 +70,12 @@ function Browser(opts) {
           'sub': SubRenderer
         };
 
+    if (opts.externalRenderers && typeof opts.externalRenderers === "object") {
+        for (var k in opts.externalRenderers) {
+            this.renderers[k] = opts.externalRenderers[k];
+        }
+    }
+
     this.defaultRenderer = opts.renderer || DefaultRenderer;
 
     this.prefix = '//www.biodalliance.org/release-0.14/';
@@ -114,7 +120,7 @@ function Browser(opts) {
 
     this.minExtraWidth = 100.0;
     this.maxExtraWidth = 1000.0;
-    
+
     // Options.
 
     this.reverseScrolling = false;
@@ -196,7 +202,7 @@ function Browser(opts) {
     for (var k in opts) {
         this[k] = opts[k];
     }
-    
+
     if (typeof(opts.uiPrefix) === 'string' && typeof(opts.prefix) !== 'string') {
         this.prefix = opts.uiPrefix;
     }
@@ -300,7 +306,7 @@ Browser.prototype.realInit = function() {
             throw Error('pageName must be a valid element ID (or use the injectionPoint option instead)');
         }
     }
-    
+
     this.browserHolderHolder.classList.add('dalliance-injection-point');
     this.browserHolder = makeElement('div', null, {className: 'dalliance dalliance-root', tabIndex: -1});
     if (this.maxHeight) {
@@ -1882,9 +1888,6 @@ Browser.prototype._setLocation = function(newChr, newMin, newMax, newChrInfo, ca
         }
 
         this.refresh();
-        // var self = this;
-        // this.tiers.forEach(function(tier) {self.refreshTier(tier);});
-        // this.refreshTier
 
         if (this.savedZoom) {
             newZS -= this.zoomMin;
