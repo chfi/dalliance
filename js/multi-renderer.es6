@@ -34,6 +34,10 @@ function drawTier(multiTier) {
     let multiConfig = multiTier.dasSource.multi;
     let getSubConfig = t => t.dasSource.sub;
 
+    multiTier.glyphCacheOrigin = multiTier.browser.viewStart;
+
+    multiTier.subtiers = [];
+
     // Padding is used for finding the correct canvas size and must be set
     if (!multiTier.padding)
         multiTier.padding = 3;
@@ -57,20 +61,26 @@ function drawTier(multiTier) {
         R.reduce((acc, offset) => offset < acc ? offset : acc, 0)
     )(tiers);
 
+
     tiers.forEach(tier => {
         if (tier.sequenceSource) {
             drawSeqTier(tier, tier.currentSequence);
-        } else {
-            // Shift subtiers up by the minimum offset,
-            // so that there's no empty space at the top
-            DefaultRenderer.prepareSubtiers(tier, canvas,
-                                            getSubConfig(tier).offset - minOffset,
-                                            false);
-        }
 
-        // Must be set for painting to work
-        if (!multiTier.glyphCacheOrigin)
-            multiTier.glyphCacheOrigin = tier.glyphCacheOrigin;
+        } else if (tier.currentFeatures) {
+            if (tier.dasSource.renderer !== "sub" && tier.dasSource.renderer !== "multi") {
+
+                const renderer = tier.browser.getTierRenderer(tier);
+                renderer.prepareSubtiers(tier);
+
+            } else {
+                DefaultRenderer.prepareSubtiers(tier, canvas,
+                                                0.0,
+                                                false);
+            }
+            tier.subtiers.forEach(st => st.offset = tier.dasSource.sub.offset);
+
+            multiTier.subtiers = multiTier.subtiers.concat(tier.subtiers);
+        }
     });
 
     // The canvas should fit all subtiers, including offsets, but no more
@@ -87,33 +97,40 @@ function drawTier(multiTier) {
 
     tiers.sort((t1, t2) => getSubConfig(t1).z > getSubConfig(t2).z);
 
-    // TODO: make it add the glyph on to the first available tier;
-    // crashes if last tier is empty...
-    if (multiConfig.grid && tiers && tiers[tiers.length-1] && tiers[tiers.length-1].subtiers[0]) {
-        let grid = new GridGlyph(canvasHeight,
-                                 multiConfig.grid_offset,
-                                 multiConfig.grid_spacing);
-        // pretty hacky way of adding the grid, but it works (mostly)
-        tiers[tiers.length-1].subtiers[0].glyphs.unshift(grid);
-    }
 
     tiers.forEach(tier => {
         // Need to save and restore canvas to make sure that the subtiers are
         // drawn on top of one another, if not shifted...
         canvas.save();
-        DefaultRenderer.paint(tier, canvas, retina, true);
+
+        // better to translate here than shove a yoffset deep in the renderer
+        canvas.translate(0, getSubConfig(tier).offset);
+
+        DefaultRenderer.paint(tier, canvas, retina);
+
         canvas.restore();
     });
+
+    if (multiConfig.grid) {
+        let grid = new GridGlyph(canvasHeight,
+                                 multiConfig.grid_offset,
+                                 multiConfig.grid_spacing);
+        grid.draw(canvas);
+    }
 
     multiTier.drawOverlay();
 
     if (multiConfig.quant) {
         let quantCanvas = DefaultRenderer.createQuantOverlay(multiTier, canvasHeight+multiTier.padding*2, retina);
+        quantCanvas.save();
         DefaultRenderer.paintQuant(quantCanvas, multiTier, multiConfig.quant, 10);
+        quantCanvas.restore();
     }
 
     if (typeof(multiTier.dasSource.drawCallback) === "function") {
+        canvas.save();
         multiTier.dasSource.drawCallback(canvas, multiTier);
+        canvas.restore();
     }
 
     multiTier.originHaxx = 0;
