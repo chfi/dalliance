@@ -10,11 +10,15 @@
         <title>Mouse GRCm38 :: Dalliance</title>
         <script language="javascript" src="../build/dalliance-all.js"></script>
 
-        <script language="javascript" src="./gwasRenderer.js"></script>
+        <script language="javascript" src="./psRenderer.js"></script>
 
         <script language="javascript">
 
-         var gwasRenderer = WrappedRenderer.wrapRenderer(PS["Biodalliance.Renderer.GWAS"].createRenderer({canvasHeight: 300.0}));
+         var gwasRenderer = WrappedRenderer.wrapRenderer(
+             PS["Biodalliance"].gwasGlyphify, 300.0, 0.0);
+
+         var qtlRenderer = WrappedRenderer.wrapRenderer(
+             PS["Biodalliance"].qtlGlyphify, 300.0, 0.0);
 
          var b = new Browser({
              chr:        '11',
@@ -25,7 +29,8 @@
              maxViewWidth: 20000000,
              cookieKey:  'mouse38',
 
-             renderers: { gwasRenderer: gwasRenderer },
+             externalRenderers: { gwasRenderer: gwasRenderer,
+                                  qtlRenderer: qtlRenderer},
 
              coordSystem: {
                  speciesName: 'Mouse',
@@ -40,9 +45,12 @@
                              desc: 'Mouse reference genome build GRCm38',
                              tier_type: 'sequence',
                              provides_entrypoints: true}
-                           ,{name: 'QTL',
+                           ,{name: 'GWAS',
                              tier_type: 'qtl',
                              renderer: "gwasRenderer",
+                             sub: { multi_id: "multi_1",
+                                    offset: 10.0
+                             },
                              uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv',
                              style: [
                                  { type: "default",
@@ -59,7 +67,66 @@
                                             STEPS: "500"
                                    }
                                  }
-                             ]},
+                             ]},{name: 'QTL',
+                             tier_type: 'qtl',
+                             renderer: "qtlRenderer",
+                             sub: { multi_id: "multi_1",
+                                    offset: 10.0
+                             },
+                             uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv',
+                             style: [
+                                 { type: "default",
+                                   style: { glyph: "LINEPLOT",
+                                            BUMP: "no",
+                                            COLOR1: "blue",
+                                            COLOR2: "blue",
+                                            COLOR3: "blue",
+                                            HEIGHT: "120",
+                                            MAX: "50",
+                                            MIN: "0",
+                                            AUTOMAX: "yes",
+                                            AUTOMIN: "yes",
+                                            STEPS: "500"
+                                   }
+                                 }
+                             ]},/*{name: 'SNP density',
+                             jbURI: "http://test-gn2.genenetwork.org/api_pre1/snp/",
+                             jbQuery: "",
+                             style: [
+                                 { type: "default",
+                                   style: { glyph: "HISTOGRAM",
+                                            MIN: 0,
+                                            MAX: 1000,
+                                            AUTOMAX: "yes",
+                                            STEPS: 500,
+                                            HIDEAXISLABEL: "yes",
+                                            COLOR1: "red",
+                                            COLOR2: "red",
+                                            COLOR3: "red",
+                                            HEIGHT: 120,
+                                   }
+                                 }
+                             ],
+                             refetchOnZoom: true,
+                             sub: {
+                                 multi_id: "multi_1",
+                                 offset: 0,
+                                 z: 0,
+                             },
+                             renderer: 'sub',
+                           },*/
+                           ,{name: 'QTL, SNP Density',
+                             tier_type: 'multi',
+                             renderer: 'multi',
+                             drawCallback: rulerDrawCallback,
+                             rulers: [{ value: 0.45, min: 0, max: 1, width: 3, height: 200, offset: 130, color: 'darkred' }],
+                             multi: {
+                                 multi_id: "multi_1",
+                                 grid: true,
+                                 grid_offset: 0,
+                                 grid_spacing: 10,
+                             },
+                           }
              ],
              uiPrefix: '../',
 
