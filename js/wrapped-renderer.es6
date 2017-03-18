@@ -20,9 +20,30 @@ function wrapRenderer(glyphifyFeatures, canvasHeight) {
         tier.padding = 3;
         tier.subtiers = [];
 
-        const glyphs = glyphifyFeatures(view)(features);
+        const results = glyphifyFeatures(view)(features);
 
-        tier.subtiers[0] = {glyphs: glyphs, height: 300.0};
+        // If all the results are a string, we want to show it on screen - something went wrong.
+        if (typeof results === "string") {
+            tier.updateStatus(results);
+        } else {
+            // Otherwise we want to print the errors to console, while telling the user something went wrong.
+            let status = "";
+            results.forEach(r => {
+                if (typeof r === "string") {
+                    if (status === "") {
+                        status = "Error when parsing features - see browser console";
+                    }
+                    console.log(r);
+                }
+            });
+            if (status !== "")
+                tier.updateStatus(status);
+            tier.subtiers[0] =
+                { glyphs: results.filter(r => typeof r !== "string"),
+                  height: canvasHeight
+                };
+        }
+
 
         tier.glyphCacheOrigin = tier.browser.viewStart;
     };
