@@ -28,7 +28,7 @@ function wrapRenderer(glyphifyFeatures, canvasHeight) {
         } else {
             // Otherwise we want to print the errors to console, while telling the user something went wrong.
             let status = "";
-            results.forEach(r => {
+            results.glyphs.forEach(r => {
                 if (typeof r === "string") {
                     if (status === "") {
                         status = "Error when parsing features - see browser console";
@@ -39,9 +39,13 @@ function wrapRenderer(glyphifyFeatures, canvasHeight) {
             if (status !== "")
                 tier.updateStatus(status);
             tier.subtiers[0] =
-                { glyphs: results.filter(r => typeof r !== "string"),
+                { glyphs: results.glyphs.filter(r => typeof r !== "string"),
                   height: canvasHeight
                 };
+        }
+
+        if (results.quant) {
+            tier.subtiers[0].quant = results.quant;
         }
 
 
