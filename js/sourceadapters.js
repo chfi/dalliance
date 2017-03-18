@@ -104,6 +104,9 @@ Browser.prototype.createSources = function(config) {
         return sources;
 
     var fs, ss;
+    if (config.tier_type === "multi") {
+        return { fs: null, ss: null };
+    }
 
     if (config.tier_type == 'sequence' || config.twoBitURI || config.twoBitBlob) {
         if (config.twoBitURI || config.twoBitBlob) {
