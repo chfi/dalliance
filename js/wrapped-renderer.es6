@@ -12,7 +12,8 @@ function wrapRenderer(glyphifyFeatures, canvasHeight) {
     const prepareSubtiers = tier => {
 
         const view = { viewStart: tier.browser.viewStart,
-                       scale: tier.browser.scale
+                       scale: tier.browser.scale,
+                       height: canvasHeight
                      };
 
         const features = tier.currentFeatures;
@@ -36,8 +37,10 @@ function wrapRenderer(glyphifyFeatures, canvasHeight) {
                     console.log(r);
                 }
             });
-            if (status !== "")
+            if (status !== "") {
                 tier.updateStatus(status);
+            }
+
             tier.subtiers[0] =
                 { glyphs: results.glyphs.filter(r => typeof r !== "string"),
                   height: canvasHeight
@@ -45,6 +48,7 @@ function wrapRenderer(glyphifyFeatures, canvasHeight) {
         }
 
         if (results.quant) {
+            console.log(results.quant);
             tier.subtiers[0].quant = results.quant;
         }
 
