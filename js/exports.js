@@ -1,6 +1,6 @@
 /* -*- mode: javascript; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 
-// 
+//
 // Dalliance Genome Explorer
 // (c) Thomas Down 2006-2014
 //
@@ -40,3 +40,5 @@ window.Ruler = ruler.Ruler;
 window.rulerDrawCallback = ruler.rulerDrawCallback;
 
 window.WrappedRenderer = require("./wrapped-renderer.es6");
+
+window.WrappedSource = require("./wrapped-source.es6");
