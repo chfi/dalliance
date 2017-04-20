@@ -15,14 +15,24 @@
         <script language="javascript">
 
          var gwasRenderer = WrappedRenderer.wrapRenderer(
-             PS["Genetics.Browser"].gwasGlyphify, 300.0);
+             PS.gwasGlyphify, 300.0);
+         /* PS["Genetics.Browser"].gwasGlyphify, 300.0);*/
 
          var qtlRenderer = WrappedRenderer.wrapRenderer(
-             PS["Genetics.Browser"].qtlGlyphify({ minScore: 4.0
-                                                , maxScore: 6.0
-                                                , color: "#ff0000"
+             /* PS["Genetics.Browser"].qtlGlyphify({ minScore: 4.0*/
+             PS.qtlGlyphify({ minScore: 4.0
+                            , maxScore: 6.0
+                            , color: "#ff0000"
              }),
              200.0);
+
+         /* var cy = PS["Genetics.Browser"].cytoscape("cyHolder");*/
+         /* var cy = PS.cytoscape("cyHolder");*/
+         /* console.log(cy);*/
+
+         var qtlSource = WrappedSource.wrapSource(PS.qtlFetch);
+         /* var qtlSource = WrappedSource.wrapSource(PS["Genetics.Browser"].qtlFetch);*/
+         console.log(qtlSource);
 
          var b = new Browser({
              chr:        '11',
@@ -51,15 +61,21 @@
                              desc: 'Mouse reference genome build GRCm38',
                              tier_type: 'sequence',
                              provides_entrypoints: true}
-                           ,{name: 'GWAS',
+                           /*,{name: 'GWAS',
                              renderer: "gwasRenderer",
                              "forceReduction": -1,
                              bwgURI: 'http://localhost:8080/gwascatalog.bb',
-                             },
-                            {name: 'QTL',
+                           }*/
+                           /*,{name: 'QTL',
                              tier_type: 'qtl',
                              renderer: "qtlRenderer",
                              uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv',
+                             },*/
+                           ,{name: 'QTL 2',
+                             tier_type: 'external',
+                             external_fetch: PS.qtlFetch("http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv"),
+                             stylesheet: {},
+                             renderer: "qtlRenderer",
                              },
                            ,
              ],
@@ -74,6 +90,19 @@
     </head>
 
     <body>
+        <style>
+            #svgHolder {
+                width: 100%,
+                float: left;
+            }
+            #cyHolder {
+                width: 100%;
+                height: 300px;
+                float: left;
+                display: block;
+            }
+        </style>
         <div id='svgHolder'>Failed to load the Biodalliance genome browser.  Have you run "gulp"?</div>
+        <div id="cyHolder" >Failed to load Cytoscape.</div>
     </body>
 </html>
