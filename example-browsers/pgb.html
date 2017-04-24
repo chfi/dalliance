@@ -16,23 +16,45 @@
 
          var gwasRenderer = WrappedRenderer.wrapRenderer(
              PS.gwasGlyphify, 300.0);
-         /* PS["Genetics.Browser"].gwasGlyphify, 300.0);*/
 
          var qtlRenderer = WrappedRenderer.wrapRenderer(
-             /* PS["Genetics.Browser"].qtlGlyphify({ minScore: 4.0*/
              PS.qtlGlyphify({ minScore: 4.0
                             , maxScore: 6.0
                             , color: "#ff0000"
              }),
              200.0);
 
-         /* var cy = PS["Genetics.Browser"].cytoscape("cyHolder");*/
-         /* var cy = PS.cytoscape("cyHolder");*/
-         /* console.log(cy);*/
+         var cy;
+         console.log(cy);
+         window.onload = function() {
+             // ugly hack - the bounding box for clicking in cy.js gets messed up
+             // when the div is moved, which happens when BD loads
+             window.setTimeout(function() {
+                 cy = PS.cytoscape("cyHolder")(null);
+                 var ff = PS.ajaxAddEles(cy)("http://localhost:8080/eles.json")();
+
+                 PS.setOn(cy)("click")(function(ev) {
+                     if (ev.target.data().lrsLoc) {
+                         var d = ev.target.data();
+                         b.setLocation(null,
+                                       1000000 * d.lrsLoc.pos - 500000,
+                                       1000000 * d.lrsLoc.pos + 500000);
+                     }
+                 })();
+
+                 // filter edges based on chromosome
+                 // let es = cy.filter((e,i) => e.group() == "edges" && e.data().lrsLoc.chr != "Chr11");
+                 // filter the targets - source is always the original trait node
+                 // let es2 = es.targets();
+                 // es.remove();
+                 // es2.remove();
+
+
+             }, 5000);
+         };
+
 
          var qtlSource = WrappedSource.wrapSource(PS.qtlFetch);
-         /* var qtlSource = WrappedSource.wrapSource(PS["Genetics.Browser"].qtlFetch);*/
-         console.log(qtlSource);
 
          var b = new Browser({
              chr:        '11',
