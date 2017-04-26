@@ -33,24 +33,14 @@
                  cy = PS.cytoscape("cyHolder")(null);
                  var ff = PS.ajaxAddEles(cy)("http://localhost:8080/eles.json")();
 
-                 PS.setOn(cy)("click")(function(ev) {
-                     if (ev.target.data().lrsLoc) {
-                         var d = ev.target.data();
-                         b.setLocation(null,
-                                       1000000 * d.lrsLoc.pos - 500000,
-                                       1000000 * d.lrsLoc.pos + 500000);
-                     }
-                 })();
+                 PS.addCyFilter(b)(cy)();
+                 PS.addBdScrollCallback(b)(cy)();
 
-                 // filter edges based on chromosome
-                 // let es = cy.filter((e,i) => e.group() == "edges" && e.data().lrsLoc.chr != "Chr11");
-                 // filter the targets - source is always the original trait node
-                 // let es2 = es.targets();
-                 // es.remove();
-                 // es2.remove();
+                 window.setTimeout(function() {
+                     cy.layout({name: "circle"}).run();
+                 }, 500);
 
-
-             }, 5000);
+             }, 2000);
          };
 
 
@@ -83,22 +73,22 @@
                              desc: 'Mouse reference genome build GRCm38',
                              tier_type: 'sequence',
                              provides_entrypoints: true}
-                           /*,{name: 'GWAS',
+                           ,{name: 'GWAS',
                              renderer: "gwasRenderer",
                              "forceReduction": -1,
                              bwgURI: 'http://localhost:8080/gwascatalog.bb',
-                           }*/
+                           }
                            /*,{name: 'QTL',
                              tier_type: 'qtl',
                              renderer: "qtlRenderer",
                              uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv',
                              },*/
-                           ,{name: 'QTL 2',
+                           /*,{name: 'QTL 2',
                              tier_type: 'external',
                              external_fetch: PS.qtlFetch("http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv"),
                              stylesheet: {},
                              renderer: "qtlRenderer",
-                             },
+                             },*/
                            ,
              ],
              uiPrefix: '../',
