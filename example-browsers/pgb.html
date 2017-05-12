@@ -33,6 +33,7 @@
                  cy = PS.cytoscape("cyHolder")(null);
                  var ff = PS.ajaxAddEles(cy)("http://localhost:8080/eles.json")();
 
+                 PS.main(b)();
                  PS.addCyFilter(b)(cy)();
                  PS.addBdScrollCallback(b)(cy)();
 
@@ -114,6 +115,7 @@
                 display: block;
             }
         </style>
+        <div id="psgbHolder"></div>
         <div id='svgHolder'>Failed to load the Biodalliance genome browser.  Have you run "gulp"?</div>
         <div id="cyHolder" >Failed to load Cytoscape.</div>
     </body>
