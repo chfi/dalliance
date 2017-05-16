@@ -13,7 +13,8 @@ function wrapRenderer(glyphifyFeatures, canvasHeight) {
 
         const view = { viewStart: tier.browser.viewStart,
                        scale: tier.browser.scale,
-                       height: canvasHeight
+                       height: canvasHeight,
+                       chr: tier.knownChr
                      };
 
         const features = tier.currentFeatures;
