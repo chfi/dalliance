@@ -27,20 +27,8 @@
          var cy;
          console.log(cy);
          window.onload = function() {
-             // ugly hack - the bounding box for clicking in cy.js gets messed up
-             // when the div is moved, which happens when BD loads
              window.setTimeout(function() {
-                 cy = PS.cytoscape("cyHolder")(null);
-                 var ff = PS.ajaxAddEles(cy)("http://localhost:8080/eles.json")();
-
                  PS.main(b)();
-                 PS.addCyFilter(b)(cy)();
-                 PS.addBdScrollCallback(b)(cy)();
-
-                 window.setTimeout(function() {
-                     cy.layout({name: "circle"}).run();
-                 }, 500);
-
              }, 2000);
          };
 
