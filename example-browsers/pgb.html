@@ -25,15 +25,7 @@
              200.0);
 
          var cy;
-         console.log(cy);
-         window.onload = function() {
-             window.setTimeout(function() {
-                 PS.main(b)();
-             }, 2000);
-         };
-
-
-         var qtlSource = WrappedSource.wrapSource(PS.qtlFetch);
+         PS.main(b)();
 
          var b = new Browser({
              chr:        '11',
