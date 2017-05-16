@@ -108,7 +108,20 @@ Browser.prototype.createSources = function(config) {
         return { fs: null, ss: null };
     }
 
-    if (config.tier_type == 'sequence' || config.twoBitURI || config.twoBitBlob) {
+    if (config.tier_type === "external") {
+        console.log("configuring external source");
+
+        console.log(typeof config.external_fetch);
+        if (config.external_fetch && typeof config.external_fetch === "function") {
+            fs = new FeatureSourceBase();
+            fs.fetch = (a,b,c,d,e,f,g) => config.external_fetch(a,b,c,d,e,f,g)();
+            ss = null;
+            console.log("external source:");
+            console.log(fs);
+        } else {
+            console.log("misconfigured external feature source");
+        }
+    } else if (config.tier_type == 'sequence' || config.twoBitURI || config.twoBitBlob) {
         if (config.twoBitURI || config.twoBitBlob) {
             ss = new TwoBitSequenceSource(config);
         } else if (config.ensemblURI) {
@@ -165,7 +178,7 @@ Browser.prototype.createSources = function(config) {
         fs.name = config.name;
     }
 
-    if (typeof fs !== 'undefined' && fs !== null) {
+    if (typeof fs !== 'undefined' && fs !== null && config.tier_type !== "external") {
         fs = new CachingFeatureSource(fs);
     }
 
