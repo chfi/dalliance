@@ -40,5 +40,3 @@ window.Ruler = ruler.Ruler;
 window.rulerDrawCallback = ruler.rulerDrawCallback;
 
 window.WrappedRenderer = require("./wrapped-renderer.es6");
-
-window.WrappedSource = require("./wrapped-source.es6");
