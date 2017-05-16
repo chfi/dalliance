@@ -1,0 +1,5 @@
+localhost:8080
+tls off
+cors {
+  allowed_headers  Range
+}
