@@ -14,77 +14,8 @@
 
         <script language="javascript">
 
-         var gwasRenderer = WrappedRenderer.wrapRenderer(
-             PS.gwasGlyphify, 300.0);
+         PS.main(WrappedRenderer.wrapRenderer)(Browser)();
 
-         var qtlRenderer = WrappedRenderer.wrapRenderer(
-             PS.qtlGlyphify({ minScore: 4.0
-                            , maxScore: 6.0
-                            , color: "#ff0000"
-             }),
-             200.0);
-
-         // HTMLElement -> Eff _ Biodalliance
-         var mkBd = function(el) {
-             return function() {
-                var b = new Browser({
-                    injectionPoint: el,
-                    chr:        '11',
-                    defaultStart: 10000000,
-                    defaultEnd: 30000000,
-                    viewStart:  10000000,
-                    viewEnd:    30000000,
-                    maxViewWidth: 20000000,
-                    cookieKey:  'mouse38',
-
-                    externalRenderers: { gwasRenderer: gwasRenderer,
-                                        qtlRenderer: qtlRenderer
-                    },
-
-                    coordSystem: {
-                        speciesName: 'Mouse',
-                        taxon: 10090,
-                        auth: 'GRCm',
-                        version: 38,
-                        ucscName: 'mm10'
-                    },
-                    maxWorkers: 0,
-
-                    sources:      [{name: 'Genome',
-                                    twoBitURI:  'http://www.biodalliance.org/datasets/GRCm38/mm10.2bit',
-                                    desc: 'Mouse reference genome build GRCm38',
-                                    tier_type: 'sequence',
-                                    provides_entrypoints: true}
-                                ,{name: 'GWAS',
-                                    renderer: "gwasRenderer",
-                                    "forceReduction": -1,
-                                    bwgURI: 'http://localhost:8080/gwascatalog.bb',
-                                }
-                        /*,{name: 'QTL',
-                            tier_type: 'qtl',
-                            renderer: "qtlRenderer",
-                            uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv',
-                            },*/
-                        /*,{name: 'QTL 2',
-                            tier_type: 'external',
-                            external_fetch: PS.qtlFetch("http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv"),
-                            stylesheet: {},
-                            renderer: "qtlRenderer",
-                            },*/
-                    ,
-                    ],
-                    uiPrefix: '../',
-
-                    fullScreen: true
-                });
-
-                return b;
-             };
-         };
-
-         PS.main(mkBd)();
-
-         /* b.reset();*/
         </script>
     </head>
 
@@ -101,6 +32,10 @@
                 float: left;
                 display: block;
             }
+         .powered-by {
+             display: none;
+
+         }
         </style>
         <div id="psgbHolder"></div>
     </body>
