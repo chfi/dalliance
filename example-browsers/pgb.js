@@ -63284,20 +63284,8 @@ exports.initBDimpl = function(opts) {
                         renderers[r.name] = wrapRenderer(r.renderer, r.canvasHeight);
                     });
 
-                    var sources = [{
-                        name: 'Genome',
-                        twoBitURI: 'http://www.biodalliance.org/datasets/GRCm38/mm10.2bit',
-                        desc: 'Mouse reference genome build GRCm38',
-                        tier_type: 'sequence',
-                        provides_entrypoints: true
-                    }];
-
-
-
                     // TODO: make sure to only add BD tracks when that becomes relevant
-                    sources = sources.concat(opts.sources);
-
-                    console.log(sources);
+                    var sources = opts.sources;
 
                     var b = new browser({
 
@@ -63321,7 +63309,7 @@ exports.initBDimpl = function(opts) {
 
                         // these should be set based on the track configs in opts,
                         // but that's probably overkill right now...
-                        externalRenderers: opts.externalRenderers,
+                        externalRenderers: renderers,
                         // externalRenderers: { gwasRenderer: gwasRenderer,
                         //                      qtlRenderer: qtlRenderer
                         //                    },
@@ -63351,10 +63339,6 @@ exports.initBDimpl = function(opts) {
                         //     {
                         //         name: 'GWAS',
                         //         renderer: "gwasRenderer",
-                        //         sub: {
-                        //             multi_id: "multi_1",
-                        //             offset: 0.0
-                        //         },
                         //         "forceReduction": -1,
                         //         bwgURI: 'http://localhost:8080/gwascatalog.bb'
                         //     },
@@ -63362,22 +63346,7 @@ exports.initBDimpl = function(opts) {
                         //         name: 'QTL',
                         //         tier_type: 'qtl',
                         //         renderer: "qtlRenderer",
-                        //         sub: {
-                        //             multi_id: "multi_1",
-                        //             offset: 0.0
-                        //         },
                         //         uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv'
-                        //     },
-                        //     {
-                        //         name: 'QTL, GWAS',
-                        //         tier_type: 'multi',
-                        //         renderer: 'multi',
-                        //         multi: {
-                        //             multi_id: "multi_1",
-                        //             grid: true,
-                        //             grid_offset: 0,
-                        //             grid_spacing: 10
-                        //         }
                         //     }
                         // ],
                         /*uiPrefix: '../',*/
@@ -63392,11 +63361,6 @@ exports.initBDimpl = function(opts) {
     };
 };
 
-
-// exports.createTrackConfig = function(config) {
-//     return { name: config.name,
-//              }
-// };
 
 exports.addFeatureListener = function(bd) {
     return function(callback) {
@@ -63505,20 +63469,45 @@ module.exports = {
 },{"../Control.Monad.Eff":157,"../Control.Semigroupoid":188,"../DOM.HTML.Types":219,"../Data.Argonaut.Core":240,"../Data.Foreign":306,"../Data.Function":310,"../Data.Options":385,"../Genetics.Browser.Config.Track":430,"../Genetics.Browser.Types":449,"../Genetics.Browser.Units":453,"../Prelude":503,"../Unsafe.Coerce":511,"./foreign":428}],430:[function(require,module,exports){
 "use strict";
 var Control_Semigroupoid = require("../Control.Semigroupoid");
+var Data_Argonaut = require("../Data.Argonaut");
+var Data_Argonaut_Prisms = require("../Data.Argonaut.Prisms");
+var Data_Either = require("../Data.Either");
 var Data_Foreign = require("../Data.Foreign");
+var Data_Function = require("../Data.Function");
+var Data_Lens = require("../Data.Lens");
+var Data_Lens_Fold = require("../Data.Lens.Fold");
+var Data_Lens_Index = require("../Data.Lens.Index");
+var Data_Lens_Internal_Forget = require("../Data.Lens.Internal.Forget");
+var Data_Maybe = require("../Data.Maybe");
+var Data_Maybe_First = require("../Data.Maybe.First");
 var Prelude = require("../Prelude");
+
+// TODO add some BD validation
 var BDTrackConfig = function (x) {
     return x;
 };
-var makeBDTrack = function ($0) {
-    return BDTrackConfig(Data_Foreign.toForeign($0));
+var validateBDConfig = function (json) {
+    var v = Data_Lens_Fold.previewOn(json)(function ($3) {
+        return Data_Argonaut_Prisms._Object(Data_Lens_Internal_Forget.choiceForget(Data_Maybe_First.monoidFirst))(Data_Lens_Index.ix(Data_Lens_Index.indexStrMap)("name")(Data_Lens_Internal_Forget.wanderForget(Data_Maybe_First.monoidFirst))($3));
+    });
+    if (v instanceof Data_Maybe.Nothing) {
+        return Data_Either.Left.create("BD track config does not have a name");
+    };
+    if (v instanceof Data_Maybe.Just) {
+        return Data_Either.Right.create(BDTrackConfig(Data_Foreign.toForeign(json)));
+    };
+    throw new Error("Failed pattern match at Genetics.Browser.Config.Track line 19, column 25 - line 21, column 48: " + [ v.constructor.name ]);
+};
+var makeBDTrack = function ($4) {
+    return BDTrackConfig(Data_Foreign.toForeign($4));
 };
 module.exports = {
     BDTrackConfig: BDTrackConfig, 
-    makeBDTrack: makeBDTrack
+    makeBDTrack: makeBDTrack, 
+    validateBDConfig: validateBDConfig
 };
 
-},{"../Control.Semigroupoid":188,"../Data.Foreign":306,"../Prelude":503}],431:[function(require,module,exports){
+},{"../Control.Semigroupoid":188,"../Data.Argonaut":252,"../Data.Argonaut.Prisms":250,"../Data.Either":285,"../Data.Foreign":306,"../Data.Function":310,"../Data.Lens":362,"../Data.Lens.Fold":335,"../Data.Lens.Index":338,"../Data.Lens.Internal.Forget":341,"../Data.Maybe":369,"../Data.Maybe.First":367,"../Prelude":503}],431:[function(require,module,exports){
 "use strict";
 
 exports.collectionJson = function(coll) {
@@ -65423,7 +65412,6 @@ module.exports = {
 };
 
 },{"../Control.Applicative":121,"../Control.Bind":127,"../Control.Monad.Aff":139,"../Control.Monad.Aff.AVar":133,"../Control.Monad.Aff.Class":134,"../Control.Monad.Eff":157,"../Control.Monad.Eff.Class":142,"../Control.Monad.Eff.Console":144,"../Control.Monad.Except":160,"../Control.Monad.State.Class":175,"../Control.Semigroupoid":188,"../DOM.HTML.Types":219,"../Data.Argonaut":252,"../Data.Argonaut.Core":240,"../Data.Argonaut.Prisms":250,"../Data.Either":285,"../Data.Eq":288,"../Data.Foreign":306,"../Data.Foreign.Class":295,"../Data.Function":310,"../Data.Lens":362,"../Data.Lens.Fold":335,"../Data.Lens.Index":338,"../Data.Lens.Internal.Forget":341,"../Data.Lens.Internal.Re":345,"../Data.Lens.Iso":351,"../Data.Maybe":369,"../Data.Maybe.First":367,"../Data.Ord":389,"../Data.Ordering":390,"../Data.Ring":400,"../Data.Semiring":404,"../Data.Unit":426,"../Genetics.Browser.Biodalliance":429,"../Genetics.Browser.Events":437,"../Genetics.Browser.Types":449,"../Genetics.Browser.Units":453,"../Global.Unsafe":455,"../Halogen":489,"../Halogen.Component":468,"../Halogen.HTML":475,"../Halogen.HTML.Core":471,"../Halogen.HTML.Elements":472,"../Halogen.HTML.Properties":474,"../Halogen.Query":480,"../Halogen.Query.EventSource":476,"../Halogen.Query.HalogenM":478,"../Halogen.Query.InputF":479,"../Prelude":503}],451:[function(require,module,exports){
-// Generated by purs version 0.11.4
 "use strict";
 var Control_Applicative = require("../Control.Applicative");
 var Control_Bind = require("../Control.Bind");
@@ -65433,13 +65421,23 @@ var Control_Monad_Eff_Class = require("../Control.Monad.Eff.Class");
 var Control_Monad_Eff_Console = require("../Control.Monad.Eff.Console");
 var DOM_HTML_Types = require("../DOM.HTML.Types");
 var DOM_Node_ParentNode = require("../DOM.Node.ParentNode");
+var Data_Argonaut = require("../Data.Argonaut");
+var Data_Argonaut_Prisms = require("../Data.Argonaut.Prisms");
+var Data_Array = require("../Data.Array");
 var Data_Const = require("../Data.Const");
 var Data_Either = require("../Data.Either");
 var Data_Either_Nested = require("../Data.Either.Nested");
 var Data_Eq = require("../Data.Eq");
+var Data_Foldable = require("../Data.Foldable");
 var Data_Function = require("../Data.Function");
+var Data_Functor = require("../Data.Functor");
 var Data_Functor_Coproduct_Nested = require("../Data.Functor.Coproduct.Nested");
+var Data_Lens = require("../Data.Lens");
+var Data_Lens_Fold = require("../Data.Lens.Fold");
+var Data_Lens_Internal_Forget = require("../Data.Lens.Internal.Forget");
 var Data_Maybe = require("../Data.Maybe");
+var Data_Maybe_First = require("../Data.Maybe.First");
+var Data_Monoid = require("../Data.Monoid");
 var Data_Newtype = require("../Data.Newtype");
 var Data_Options = require("../Data.Options");
 var Data_Ord = require("../Data.Ord");
@@ -65468,6 +65466,8 @@ var Halogen_HTML_Events = require("../Halogen.HTML.Events");
 var Halogen_Query = require("../Halogen.Query");
 var Halogen_Query_HalogenM = require("../Halogen.Query.HalogenM");
 var Halogen_VDom_Driver = require("../Halogen.VDom.Driver");
+var Partial = require("../Partial");
+var Partial_Unsafe = require("../Partial.Unsafe");
 var Prelude = require("../Prelude");
 var BDTrack = (function () {
     function BDTrack() {
@@ -65573,9 +65573,8 @@ var DistEvent = (function () {
 var qtlTrack = Genetics_Browser_Config_Track.makeBDTrack({
     name: "QTL", 
     renderer: "qtlRenderer", 
-    stylesheet: Data_Unit.unit, 
     uri: "http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv", 
-    tier_type: "external"
+    tier_type: "qtl"
 });
 var qtlGlyphify = Genetics_Browser_Renderer_Lineplot.render;
 var qtlRenderer = {
@@ -65590,7 +65589,7 @@ var qtlRenderer = {
 var gwasTrack = Genetics_Browser_Config_Track.makeBDTrack({
     name: "GWAS", 
     renderer: "gwasRenderer", 
-    bwgUri: "http://localhost:8080/gwascatalog.bb", 
+    bwgURI: "http://localhost:8080/gwascatalog.bb", 
     forceReduction: -1 | 0
 });
 var gwasGlyphify = Genetics_Browser_Renderer_GWAS.render;
@@ -65599,7 +65598,37 @@ var gwasRenderer = {
     renderer: gwasGlyphify, 
     canvasHeight: 300.0
 };
+var genomeTrack = Genetics_Browser_Config_Track.makeBDTrack({
+    name: "Genome", 
+    twoBitURI: "http://www.biodalliance.org/datasets/GRCm38/mm10.2bit", 
+    desc: "Mouse reference genome build GRCm38", 
+    tier_type: "sequence", 
+    provides_entrypoints: true
+});
 var component = (function () {
+    
+    // TODO the event source track should be handled automatically somehow
+
+    // #svgHolder {
+
+    //     width: 100%,
+
+    //     float: left;
+
+    // }
+
+    // #cyHolder {
+
+    //     width: 100%;
+
+    //     height: 300px;
+
+    //     float: left;
+
+    //     display: block;
+
+    // }
+var initialState = Data_Unit.unit;
     var handleCyMessage = function (v) {
         return Data_Maybe.Just.create(new DistEvent(CyTrack.value, v.value0, Data_Unit.unit));
     };
@@ -65610,7 +65639,7 @@ var component = (function () {
         if (v instanceof Genetics_Browser_UI_Biodalliance.SendEvent) {
             return Data_Maybe.Just.create(new DistEvent(BDTrack.value, v.value0, Data_Unit.unit));
         };
-        throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 116, column 3 - line 116, column 57: " + [ v.constructor.name ]);
+        throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 123, column 3 - line 123, column 57: " + [ v.constructor.name ]);
     };
     var render = function (state) {
         return Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(BDScroll.create(-1000000.0))) ])([ Halogen_HTML_Core.text("Scroll left 1MBp") ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(BDScroll.create(1000000.0))) ])([ Halogen_HTML_Core.text("Scroll right 1MBp") ]), Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(Halogen_HTML_Events.input_(ResetCy.create)) ])([ Halogen_HTML_Core.text("Reset cytoscape") ]), Halogen_HTML_Elements.div([  ])([ Halogen_HTML["slot'"](Halogen_Component_ChildPath.cp1)(Genetics_Browser_UI_Biodalliance.Slot.value)(Genetics_Browser_UI_Biodalliance.component)(Data_Unit.unit)(handleBDMessage) ]), Halogen_HTML_Elements.div([  ])([ Halogen_HTML["slot'"](Halogen_Component_ChildPath.cp2)(Genetics_Browser_UI_Cytoscape.Slot.value)(Genetics_Browser_UI_Cytoscape.component)(Data_Unit.unit)(handleCyMessage) ]) ]) ]);
@@ -65654,53 +65683,87 @@ var component = (function () {
                         if (v.value0 instanceof CyTrack) {
                             return Halogen_Query["query'"](Data_Either.eqEither(Genetics_Browser_UI_Biodalliance.eqBDSlot)(Data_Either.eqEither(Genetics_Browser_UI_Cytoscape.eqCySlot)(Data_Eq.eqVoid)))(Halogen_Component_ChildPath.cp1)(Genetics_Browser_UI_Biodalliance.Slot.value)(Halogen_Query.action(Genetics_Browser_UI_Biodalliance.RecvEvent.create(v.value1)));
                         };
-                        throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 149, column 12 - line 153, column 67: " + [ v.value0.constructor.name ]);
+                        throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 156, column 12 - line 160, column 67: " + [ v.value0.constructor.name ]);
                     })())(function (v1) {
                         return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value2);
                     });
                 });
             });
         };
-        throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 124, column 10 - line 155, column 16: " + [ v.constructor.name ]);
+        throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 131, column 10 - line 162, column 16: " + [ v.constructor.name ]);
     };
     return Halogen_Component.parentComponent(Data_Either.ordEither(Genetics_Browser_UI_Biodalliance.ordBDSlot)(Data_Either.ordEither(Genetics_Browser_UI_Cytoscape.ordCySlot)(Data_Ord.ordVoid)))({
-        initialState: Data_Function["const"](Data_Unit.unit), 
+        initialState: Data_Function["const"](initialState), 
         render: render, 
         "eval": $$eval, 
         receiver: Data_Function["const"](Data_Maybe.Nothing.value)
     });
 })();
-var bdOpts = Data_Semigroup.append(Data_Options.semigroupOptions)(Data_Options.assoc(Genetics_Browser_Biodalliance.renderers)([ qtlRenderer, gwasRenderer ]))(Data_Options.assoc(Genetics_Browser_Biodalliance.sources)([ gwasTrack, qtlTrack ]));
+var bdOpts = Data_Options.assoc(Genetics_Browser_Biodalliance.renderers)([ qtlRenderer, gwasRenderer ]);
+
+// Should take a record of RenderWrapper, BrowserConstructor,
+
+// external renderers, sources/tracks...
+
+// ... much like BD!
+
+// Track configs should be of type Foreign or Json, and parsed/checked.
 var main = function (wrapRenderer) {
     return function (browser) {
-        return Halogen_Aff_Util.runHalogenAff((function () {
-            var mkBd = Genetics_Browser_Biodalliance.initBD(bdOpts)(wrapRenderer)(browser);
-            return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("running main")))(function () {
-                return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Halogen_Aff_Util.awaitLoad)(function () {
-                    return Control_Bind.bind(Control_Monad_Aff.bindAff)(Halogen_Aff_Util.selectElement(Data_Newtype.wrap(DOM_Node_ParentNode.newtypeQuerySelector)("#psgbHolder")))(function (v) {
-                        if (v instanceof Data_Maybe.Nothing) {
-                            return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("no element for browser!"));
+        return function (bdtracks) {
+            return Halogen_Aff_Util.runHalogenAff(Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Applicative.when(Control_Monad_Aff.applicativeAff)(Data_Maybe.isNothing(Data_Lens_Fold.previewOn(bdtracks)(Data_Argonaut_Prisms._Array(Data_Lens_Internal_Forget.choiceForget(Data_Maybe_First.monoidFirst)))))(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("BD Tracks config is not an array"))))(function () {
+                var validated = Data_Maybe.maybe([  ])(Data_Functor.map(Data_Functor.functorArray)(Genetics_Browser_Config_Track.validateBDConfig))(Data_Lens_Fold.previewOn(bdtracks)(Data_Argonaut_Prisms._Array(Data_Lens_Internal_Forget.choiceForget(Data_Maybe_First.monoidFirst))));
+                var v = Data_Foldable.foldr(Data_Foldable.foldableArray)(function (c) {
+                    return function (v1) {
+                        if (c instanceof Data_Either.Left) {
+                            return {
+                                errors: Data_Array.cons(c.value0)(v1.errors), 
+                                tracks: v1.tracks
+                            };
                         };
-                        if (v instanceof Data_Maybe.Just) {
-                            return Control_Bind.bind(Control_Monad_Aff.bindAff)(Halogen_VDom_Driver.runUI(component)(Data_Unit.unit)(v.value0))(function (v1) {
-                                return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("creating BD")))(function () {
-                                    return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(v1.query(Halogen_Query.action(CreateBD.create(mkBd))))(function () {
-                                        return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("created BD!")))(function () {
-                                            return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("creating Cy.js")))(function () {
-                                                return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(v1.query(Halogen_Query.action(CreateCy.create("http://localhost:8080/eles.json"))))(function () {
-                                                    return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("created cy!"));
+                        if (c instanceof Data_Either.Right) {
+                            return {
+                                errors: v1.errors, 
+                                tracks: Data_Array.cons(c.value0)(v1.tracks)
+                            };
+                        };
+                        throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 220, column 34 - line 221, column 85: " + [ c.constructor.name ]);
+                    };
+                })({
+                    errors: [  ], 
+                    tracks: [  ]
+                })(validated);
+                var opts$prime = Data_Semigroup.append(Data_Options.semigroupOptions)(bdOpts)(Data_Options.assoc(Genetics_Browser_Biodalliance.sources)(v.tracks));
+                return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("Track errors: " + Data_Foldable.foldMap(Data_Foldable.foldableArray)(Data_Monoid.monoidString)(Data_Semigroup.append(Data_Semigroup.semigroupString)(", "))(v.errors))))(function () {
+                    var mkBd = Genetics_Browser_Biodalliance.initBD(opts$prime)(wrapRenderer)(browser);
+                    return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("running main")))(function () {
+                        return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Halogen_Aff_Util.awaitLoad)(function () {
+                            return Control_Bind.bind(Control_Monad_Aff.bindAff)(Halogen_Aff_Util.selectElement(Data_Newtype.wrap(DOM_Node_ParentNode.newtypeQuerySelector)("#psgbHolder")))(function (v1) {
+                                if (v1 instanceof Data_Maybe.Nothing) {
+                                    return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("no element for browser!"));
+                                };
+                                if (v1 instanceof Data_Maybe.Just) {
+                                    return Control_Bind.bind(Control_Monad_Aff.bindAff)(Halogen_VDom_Driver.runUI(component)(Data_Unit.unit)(v1.value0))(function (v2) {
+                                        return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("creating BD")))(function () {
+                                            return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(v2.query(Halogen_Query.action(CreateBD.create(mkBd))))(function () {
+                                                return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("created BD!")))(function () {
+                                                    return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("creating Cy.js")))(function () {
+                                                        return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Aff.bindAff)(v2.query(Halogen_Query.action(CreateCy.create("http://localhost:8080/eles.json"))))(function () {
+                                                            return Control_Monad_Eff_Class.liftEff(Control_Monad_Aff.monadEffAff)(Control_Monad_Eff_Console.log("created cy!"));
+                                                        });
+                                                    });
                                                 });
                                             });
                                         });
                                     });
-                                });
+                                };
+                                throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 234, column 3 - line 244, column 21: " + [ v1.constructor.name ]);
                             });
-                        };
-                        throw new Error("Failed pattern match at Genetics.Browser.UI.Container line 206, column 3 - line 216, column 21: " + [ v.constructor.name ]);
+                        });
                     });
                 });
-            });
-        })());
+            }));
+        };
     };
 };
 module.exports = {
@@ -65715,6 +65778,7 @@ module.exports = {
     CyTrack: CyTrack, 
     bdOpts: bdOpts, 
     component: component, 
+    genomeTrack: genomeTrack, 
     gwasGlyphify: gwasGlyphify, 
     gwasRenderer: gwasRenderer, 
     gwasTrack: gwasTrack, 
@@ -65724,7 +65788,7 @@ module.exports = {
     qtlTrack: qtlTrack
 };
 
-},{"../Control.Applicative":121,"../Control.Bind":127,"../Control.Monad.Aff":139,"../Control.Monad.Eff":157,"../Control.Monad.Eff.Class":142,"../Control.Monad.Eff.Console":144,"../DOM.HTML.Types":219,"../DOM.Node.ParentNode":232,"../Data.Const":276,"../Data.Either":285,"../Data.Either.Nested":284,"../Data.Eq":288,"../Data.Function":310,"../Data.Functor.Coproduct.Nested":314,"../Data.Maybe":369,"../Data.Newtype":380,"../Data.Options":385,"../Data.Ord":389,"../Data.Ring":400,"../Data.Semigroup":402,"../Data.Unit":426,"../Genetics.Browser.Biodalliance":429,"../Genetics.Browser.Config.Track":430,"../Genetics.Browser.Events":437,"../Genetics.Browser.Renderer.GWAS":447,"../Genetics.Browser.Renderer.Lineplot":448,"../Genetics.Browser.Types":449,"../Genetics.Browser.UI.Biodalliance":450,"../Genetics.Browser.UI.Cytoscape":452,"../Genetics.Browser.Units":453,"../Global.Unsafe":455,"../Halogen":489,"../Halogen.Aff":466,"../Halogen.Aff.Util":465,"../Halogen.Component":468,"../Halogen.Component.ChildPath":467,"../Halogen.HTML":475,"../Halogen.HTML.Core":471,"../Halogen.HTML.Elements":472,"../Halogen.HTML.Events":473,"../Halogen.Query":480,"../Halogen.Query.HalogenM":478,"../Halogen.VDom.Driver":483,"../Prelude":503}],452:[function(require,module,exports){
+},{"../Control.Applicative":121,"../Control.Bind":127,"../Control.Monad.Aff":139,"../Control.Monad.Eff":157,"../Control.Monad.Eff.Class":142,"../Control.Monad.Eff.Console":144,"../DOM.HTML.Types":219,"../DOM.Node.ParentNode":232,"../Data.Argonaut":252,"../Data.Argonaut.Prisms":250,"../Data.Array":257,"../Data.Const":276,"../Data.Either":285,"../Data.Either.Nested":284,"../Data.Eq":288,"../Data.Foldable":294,"../Data.Function":310,"../Data.Functor":318,"../Data.Functor.Coproduct.Nested":314,"../Data.Lens":362,"../Data.Lens.Fold":335,"../Data.Lens.Internal.Forget":341,"../Data.Maybe":369,"../Data.Maybe.First":367,"../Data.Monoid":378,"../Data.Newtype":380,"../Data.Options":385,"../Data.Ord":389,"../Data.Ring":400,"../Data.Semigroup":402,"../Data.Unit":426,"../Genetics.Browser.Biodalliance":429,"../Genetics.Browser.Config.Track":430,"../Genetics.Browser.Events":437,"../Genetics.Browser.Renderer.GWAS":447,"../Genetics.Browser.Renderer.Lineplot":448,"../Genetics.Browser.Types":449,"../Genetics.Browser.UI.Biodalliance":450,"../Genetics.Browser.UI.Cytoscape":452,"../Genetics.Browser.Units":453,"../Global.Unsafe":455,"../Halogen":489,"../Halogen.Aff":466,"../Halogen.Aff.Util":465,"../Halogen.Component":468,"../Halogen.Component.ChildPath":467,"../Halogen.HTML":475,"../Halogen.HTML.Core":471,"../Halogen.HTML.Elements":472,"../Halogen.HTML.Events":473,"../Halogen.Query":480,"../Halogen.Query.HalogenM":478,"../Halogen.VDom.Driver":483,"../Partial":502,"../Partial.Unsafe":500,"../Prelude":503}],452:[function(require,module,exports){
 // Generated by purs version 0.11.4
 "use strict";
 var Control_Applicative = require("../Control.Applicative");

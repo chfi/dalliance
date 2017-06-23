@@ -13,8 +13,29 @@
         <script language="javascript" src="./pgb.js"></script>
 
         <script language="javascript">
+         var sources = [
+             {
+                 name: 'Genome',
+                 twoBitURI: 'http:www.biodalliance.org/datasets/GRCm38/mm10.2bit',
+                 desc: 'Mouse reference genome build GRCm38',
+                 tier_type: 'sequence',
+                 provides_entrypoints: true
+             },
+             {
+                 name: 'GWAS',
+                 renderer: "gwasRenderer",
+                 "forceReduction": -1,
+                 bwgURI: 'http:localhost:8080/gwascatalog.bb'
+             },
+             {
+                 name: 'QTL',
+                 tier_type: 'qtl',
+                 renderer: "qtlRenderer",
+                 uri: 'http:test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv'
+             }
+         ];
 
-         PS.main(WrappedRenderer.wrapRenderer)(Browser)();
+         PS.main(WrappedRenderer.wrapRenderer)(Browser)(sources)();
 
         </script>
     </head>
