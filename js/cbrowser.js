@@ -1254,15 +1254,15 @@ Browser.prototype.reorderTiers = function() {
     var pinnedTiers = [], unpinnedTiers = [];
     for (var i = 0; i < this.tiers.length; ++i) {
         var t = this.tiers[i];
-        var visible = ['sub','dummy'].indexOf(this.tiers[i].dasSource.renderer) === -1;
+        var hasHiddenRenderer = ['sub','dummy'].indexOf(this.tiers[i].dasSource.renderer) !== -1;
         if (t.pinned && !this.disablePinning) {
             pinnedTiers.push(t);
-            if (visible)
+            if (hasHiddenRenderer || !this.tiers[i].dasSource.hidden)
                 this.pinnedTierHolder.appendChild(this.tiers[i].row);
             hasPinned = true;
         } else {
             unpinnedTiers.push(t);
-            if (visible)
+            if (hasHiddenRenderer || !this.tiers[i].dasSource.hidden)
                 this.tierHolder.appendChild(this.tiers[i].row);
         }
     }
