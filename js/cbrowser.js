@@ -1257,12 +1257,12 @@ Browser.prototype.reorderTiers = function() {
         var hasHiddenRenderer = ['sub','dummy'].indexOf(this.tiers[i].dasSource.renderer) !== -1;
         if (t.pinned && !this.disablePinning) {
             pinnedTiers.push(t);
-            if (hasHiddenRenderer || !this.tiers[i].dasSource.hidden)
+            if (!hasHiddenRenderer || !this.tiers[i].dasSource.hidden)
                 this.pinnedTierHolder.appendChild(this.tiers[i].row);
             hasPinned = true;
         } else {
             unpinnedTiers.push(t);
-            if (hasHiddenRenderer || !this.tiers[i].dasSource.hidden)
+            if (!hasHiddenRenderer || !this.tiers[i].dasSource.hidden)
                 this.tierHolder.appendChild(this.tiers[i].row);
         }
     }
