@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <style>
+        </style>
+
+        <title>Mouse GRCm38 :: Dalliance</title>
+        <script language="javascript" src="../build/dalliance-all.js"></script>
+
+        <script language="javascript" src="./pgb.js"></script>
+
+
+
+        <script language="javascript">
+         var FSB = window.FeatureSourceBase;
+
+         console.log("FSB");
+         console.log(FSB);
+
+         var sources = [
+             {
+                 name: 'Genome',
+                 twoBitURI: 'http://www.biodalliance.org/datasets/GRCm38/mm10.2bit',
+                 desc: 'Mouse reference genome build GRCm38',
+                 tier_type: 'sequence',
+                 trackType: "BDTrack",
+                 provides_entrypoints: true
+             },
+         ];
+
+         var config = { wrapRenderer: WrappedRenderer.wrapRenderer,
+                        browser: Browser,
+                        tracks: { BDTrack: sources
+                                , CyGraph: [{ elementsUri: "http://localhost:8080/eles.json" }]
+                        }
+         };
+
+         console.log(PS);
+         /* PS.main(config)();*/
+
+        </script>
+    </head>
+
+    <body>
+        <style>
+         // These styles are used by the PS elements
+         #bdDiv {
+             width: 100%,
+             float: left;
+         }
+         #cyDiv {
+             width: 100%;
+             height: 300px;
+             float: left;
+             display: block;
+         }
+         .powered-by {
+             display: none;
+         }
+        </style>
+        <div id="psgbHolder"></div>
+    </body>
+</html>
