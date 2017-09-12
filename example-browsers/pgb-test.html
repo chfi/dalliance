@@ -15,10 +15,12 @@
 
 
         <script language="javascript">
-         var FSB = window.FeatureSourceBase;
 
-         console.log("FSB");
-         console.log(FSB);
+         // factory :: config -> { features, sequence }
+         var factory = function(config) {
+             return { features: PS.createSource(PS.fetchFeature) };
+         };
+         window.dalliance_registerSourceAdapterFactory("purescript", factory);
 
          var sources = [
              {
@@ -26,20 +28,39 @@
                  twoBitURI: 'http://www.biodalliance.org/datasets/GRCm38/mm10.2bit',
                  desc: 'Mouse reference genome build GRCm38',
                  tier_type: 'sequence',
-                 trackType: "BDTrack",
                  provides_entrypoints: true
+             },
+             {
+                 name: "fetch test",
+                 tier_type: "purescript",
+                 style: [
+                     { type: "default",
+                       style: { glyph: "BOX",
+                                BUMP: "yes",
+                                COLOR1: "blue",
+                                COLOR2: "blue",
+                                COLOR3: "blue",
+                                HEIGHT: "120"
+                       }
+                     }
+                 ]
+             },
+             {
+                 name: 'GWAS',
+                 renderer: "gwasRenderer",
+                 "forceReduction": -1,
+                 trackType: "BDTrack",
+                 bwgURI: 'http://localhost:8080/gwascatalog.bb'
              },
          ];
 
          var config = { wrapRenderer: WrappedRenderer.wrapRenderer,
                         browser: Browser,
-                        tracks: { BDTrack: sources
-                                , CyGraph: [{ elementsUri: "http://localhost:8080/eles.json" }]
-                        }
+                        tracks: { BDTrack: sources }
          };
 
          console.log(PS);
-         /* PS.main(config)();*/
+         PS.main(config)();
 
         </script>
     </head>
