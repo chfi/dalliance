@@ -18,9 +18,12 @@
 
          // factory :: config -> { features, sequence }
          var factory = function(config) {
-             return { features: PS.createSource(PS.fetchFeature) };
+             return { features: PS.createSource(PS.fetchIPFSFeature(PS.parseScoreFeature)(PS.testPath)) };
          };
-         window.dalliance_registerSourceAdapterFactory("purescript", factory);
+
+         window.dalliance_registerSourceAdapterFactory("ipfsFetch", factory);
+
+
 
          var sources = [
              {
@@ -32,7 +35,8 @@
              },
              {
                  name: "fetch test",
-                 tier_type: "purescript",
+                 tier_type: "ipfsFetch",
+                 renderer: "gwasRenderer",
                  style: [
                      { type: "default",
                        style: { glyph: "BOX",
@@ -45,13 +49,13 @@
                      }
                  ]
              },
-             {
-                 name: 'GWAS',
-                 renderer: "gwasRenderer",
-                 "forceReduction": -1,
-                 trackType: "BDTrack",
-                 bwgURI: 'http://localhost:8080/gwascatalog.bb'
-             },
+             /* {*/
+             /* name: 'GWAS',*/
+             /* renderer: "gwasRenderer",*/
+             /* "forceReduction": -1,*/
+             /* trackType: "BDTrack",*/
+             /* bwgURI: 'http://localhost:8080/gwascatalog.bb'*/
+             /* }*/
          ];
 
          var config = { wrapRenderer: WrappedRenderer.wrapRenderer,
