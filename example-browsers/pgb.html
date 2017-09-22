@@ -15,27 +15,38 @@
         <script language="javascript">
          var sources = [
              {
+                 name: 'Genes',
+                 desc: 'Gene structures from GENCODE 19',
+                 bwgURI: 'http://www.biodalliance.org/datasets/gencode.bb',
+                 stylesheet_uri: 'http://www.biodalliance.org/stylesheets/gencode.xml',
+                 collapseSuperGroups: true,
+                 trixURI: 'http://www.biodalliance.org/datasets/geneIndex.ix'
+             },
+             {
                  name: 'Genome',
-                 twoBitURI: 'http:www.biodalliance.org/datasets/GRCm38/mm10.2bit',
+                 twoBitURI: 'http://www.biodalliance.org/datasets/GRCm38/mm10.2bit',
                  desc: 'Mouse reference genome build GRCm38',
                  tier_type: 'sequence',
                  provides_entrypoints: true
              },
              {
-                 name: 'GWAS',
-                 renderer: "gwasRenderer",
-                 "forceReduction": -1,
-                 bwgURI: 'http:localhost:8080/gwascatalog.bb'
-             },
-             {
                  name: 'QTL',
                  tier_type: 'qtl',
                  renderer: "qtlRenderer",
-                 uri: 'http:test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv'
+                 uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv'
              }
          ];
 
-         PS.main(WrappedRenderer.wrapRenderer)(Browser)(sources)();
+         var renderers = { "qtlRenderer": { renderer: PS.qtlRenderer, canvasHeight: 250 } };
+
+         var config = {tracks: {BDTrack: sources},
+                       browser: Browser,
+                       wrapRenderer: WrappedRenderer.wrapRenderer,
+                       renderers: renderers
+         };
+
+
+         PS.main(config)();
 
         </script>
     </head>
