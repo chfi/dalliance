@@ -18,7 +18,7 @@
                  name: 'Genes',
                  desc: 'Gene structures from GENCODE 19',
                  bwgURI: 'http://www.biodalliance.org/datasets/gencode.bb',
-                 stylesheet_uri: 'http://www.biodalliance.org/stylesheets/gencode.xml',
+                 stylesheet_uri: 'https://test-gn2.genenetwork.org/api_pre1/templates/biodalliance/gencode.xml',
                  collapseSuperGroups: true,
                  trixURI: 'http://www.biodalliance.org/datasets/geneIndex.ix'
              },
@@ -35,14 +35,29 @@
                  renderer: "qtlRenderer",
                  uri: 'http://test-gn2.genenetwork.org/api_pre1/qtl/lod2.csv'
              }
+         var bdTrackSourceConfigs = [{ eventName: "range",
+                                       eventTemplate: { "chr": "Chr",
+                                                        "minPos": "Bp",
+                                                        "maxPos": "Bp"
+                                       },
+                                       rawTemplate: { "segment": "chr",
+                                                      "min": "minPos",
+                                                      "max": "maxPos"
+                                       }
+         }];
+
          ];
 
-         var renderers = { "qtlRenderer": { renderer: PS.qtlRenderer, canvasHeight: 250 } };
+         var renderers = { "qtlRenderer": PS.qtlRenderer(250),
+                           "gwasRenderer": PS.gwasRenderer(250) };
 
-         var config = {tracks: {BDTrack: sources},
-                       browser: Browser,
-                       wrapRenderer: WrappedRenderer.wrapRenderer,
-                       renderers: renderers
+         var config = { tracks: { BDTrack: sources,
+                                  CyGraph: [{ name: "graph",
+                                              elementsUri: "http://localhost:8080/eles.json" }] },
+                        browser: Browser,
+                        wrapRenderer: WrappedRenderer.wrapRenderer,
+                        renderers: renderers,
+                        eventSources: { bd: bdTrackSourceConfigs }
          };
 
 
